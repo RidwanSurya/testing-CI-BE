@@ -1,16 +1,24 @@
 package com.example.wandoor.service;
 
 import com.example.wandoor.model.entity.OtpVerification;
+import com.example.wandoor.model.entity.RoleManagement;
 import com.example.wandoor.model.entity.UserAuth;
 import com.example.wandoor.model.request.LoginRequest;
+import com.example.wandoor.model.request.VerifyOtpRequest;
 import com.example.wandoor.model.response.LoginResponse;
+import com.example.wandoor.model.response.VerifyOtpResponse;
+import com.example.wandoor.repository.ProfileRepository;
+import com.example.wandoor.repository.RoleManagementRepository;
 import com.example.wandoor.repository.UserAuthRepository;
 import com.example.wandoor.repository.UserOtpVerificationRepository;
+import com.example.wandoor.util.Helpers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -24,23 +32,32 @@ public class LoginOtpService{
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final UserOtpVerificationRepository userOtpVerificationRepository;
     private final EmailService emailService;
+    private final Helpers helpers;
+    private final ProfileRepository profileRepository;
+    private final RoleManagementRepository roleManagementRepository;
 
 
     public LoginResponse login (LoginRequest req){
         // any userId in db?
-        var userAuth = userAuthRepository.findByUserId(req.userId());
+        var userAuth = userAuthRepository.findByUserId(req.userId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "UserId atau password salah"));
 
-        // cek apakah userAuth kosong
-        if (userAuth.isEmpty()){
-            return new LoginResponse(false, "User Not Found", null);
+        // cek apakah userAuth di block
+        if (userAuth.getIsUserBlocked() != null && userAuth.getIsUserBlocked() == 1) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Akun diblokir");
         }
 
-        // cek password
+        //  password verification
 //        var checkPassword = passwordEncoder.matches(req.password(), userAuth.get().getPassword());
-        var checkPassword = req.password().equals(userAuth.get().getPassword());
+        var checkPassword = req.password().equals(userAuth.getPassword());
         if (!checkPassword) {
             return new LoginResponse(false, "Invalid Credential", null);
         }
+
+        // get email form profile
+        var profile = profileRepository.findById(userAuth.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Profile tidak ditemukan"));
+//        var emailTo = userAuth.getEmailAddress() != null ? userAuth.getEmailAddress() ? profile.getEmailAddress();
 
         // generate OTP
         var otp = String.format("%06d", new Random().nextInt(999999));
@@ -48,20 +65,49 @@ public class LoginOtpService{
 
         // save to table OtpVerification
         var otpVerification = OtpVerification.builder()
-                .id(UUID.randomUUID().toString())
-                .userId(userAuth.get().getUserId())
+                .id(otpReff)
+                .userId(userAuth.getUserId())
                 .otpCode(otp)
-                .emailTo(userAuth.get().getEmailAddress())
+                .emailTo(userAuth.getEmailAddress())
                 .expiresAt(LocalDateTime.now().plusMinutes(5))
-                .isUsed(false)
+                .isUsed(0)
                 .createdTime(LocalDateTime.now())
                 .build();
         userOtpVerificationRepository.save(otpVerification);
 
         // sent OTP by email
-        emailService.sendOtp(userAuth.get().getEmailAddress(), otp);
+        emailService.sendOtp(userAuth.getEmailAddress(), otp);
 
-        return new LoginResponse(true, "OTP dikirim", otpReff);
+        return new LoginResponse(true, "Kode OTP telah dikirim", otpReff);
+    }
+
+    public VerifyOtpResponse verifyOtp(VerifyOtpRequest req) {
+        var ref = UUID.fromString(req.otpRef());
+        // get row otp
+        var otpRow = userOtpVerificationRepository.findByIdAndIsUsed(req.otpRef(), 0)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP tidak valid"));
+
+        // cek expired
+        if (otpRow.getExpiresAt().isBefore(LocalDateTime.now())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP expired");
+        }
+
+        // compare otp input and db
+        if (!helpers.safeEquals(otpRow.getOtpCode(), req.otp())){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "OTP Salah");
+        }
+
+        // used and make jwt
+        otpRow.setIsUsed(1);
+
+        var role = roleManagementRepository.findFirstByUserId(otpRow.getUserId())
+                        .map(RoleManagement::getRollName).orElse("Nasabah");
+
+        userOtpVerificationRepository.save(otpRow);
+
+        var jwt = helpers.issuejwt(otpRow.getUserId(), role);
+
+        return new VerifyOtpResponse(true, "login berhasil", jwt, null);
     }
 }
 

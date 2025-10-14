@@ -1,7 +1,9 @@
 package com.example.wandoor.controller;
 
 import com.example.wandoor.model.request.LoginRequest;
+import com.example.wandoor.model.request.VerifyOtpRequest;
 import com.example.wandoor.model.response.LoginResponse;
+import com.example.wandoor.model.response.VerifyOtpResponse;
 import com.example.wandoor.service.LoginOtpService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,10 @@ public class AuthController {
         return ResponseEntity.ok(loginOtpService.login(req));
     }
 
-//    @PostMapping("/verify/otp")
+    @PostMapping("/verify/otp")
+    public ResponseEntity<VerifyOtpResponse> verifyOtp (
+            @Valid @RequestBody VerifyOtpRequest req){
+        return ResponseEntity.ok(loginOtpService.verifyOtp(req));
+    }
 
 }
