@@ -1,23 +1,26 @@
 services:
   oracle:
-    image: gvenzl/oracle-xe:latest
-    platform: linux/amd64
+    image: gvenzl/oracle-free:23-slim
+    
     container_name: oracle-db-app
     ports:
       - "1521:1521"
+      - "5500:5500"
 
     environment:
-      - ORACLE_PASSWORD=root
-      - ORACLE_DATABASE=wandoor_db
-      - APP_USER=wandoor
-      - APP_USER_PASSWORD=root
+      ORACLE_PASSWORD: root
+      ORACLE_DATABASE: wandoor_db
+      APP_USER: wandoor
+      APP_USER_PASSWORD: root
 
     volumes:
       - oracle-data:/opt/oracle/oradata
+
     networks:
       - wandoor-network
+
     healthcheck:
-      test: ["CMD", "bash", "-c", "echo 'SELECT 1 FROM dual;' | sqlplus -s system/kampungbali@//localhost:1521/FREEPDB1"]
+      test: ["CMD-SHELL", "echo 'SELECT 1 FROM dual;' | sqlplus -s system/root@//localhost:1521/XEPDB1 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 10
