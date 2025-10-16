@@ -1,14 +1,20 @@
-# Gradle build output
-/build/
+# Gradle
 .gradle/
-!gradle/wrapper/gradle-wrapper.jar
+build/
 
-# IntelliJ files
+# IntelliJ IDEA / JetBrains IDEs
 .idea/
 *.iml
 
-# Logs
+# VS Code
+.vscode/
+
+# Log / temporary files
 *.log
+*.tmp
+*.bin
+*.lock
 
 # OS files
 .DS_Store
+Thumbs.db
