@@ -57,8 +57,8 @@ public class LoginOtpService{
         }
 
         //  password verification
-        // var checkPassword = passwordEncoder.matches(req.password(), userAuth.getPassword());
         var checkPassword = req.password().equals(userAuth.getPassword());
+//        var checkPassword = passwordEncoder.matches(req.password(), userAuth.getPassword());
         if (!checkPassword) {
             return new LoginResponse(false, "Invalid Credential", null);
         }

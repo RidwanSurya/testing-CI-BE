@@ -22,7 +22,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login (
             @Valid @RequestBody LoginRequest req) {
-//        System.out.println("🔥 Login request masuk: " + req.username()));
+//        System.out.println("🔥 Login request masuk: " +
+//        req.username()));
         return ResponseEntity.ok(loginOtpService.login(req));
     }
 
