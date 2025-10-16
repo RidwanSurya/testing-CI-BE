@@ -1,47 +1,61 @@
 package com.example.wandoor.model.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.type.NumericBooleanConverter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Builder
-@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class OtpVerification {
+public class TrxHistory {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
-    @UuidGenerator
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String id;
 
     @Column(nullable = false)
     private String userId;
 
     @Column(nullable = false)
-    private String otpCode;
+    private String accountNumber;
 
     @Column(nullable = false)
-    private String emailTo;
+    private LocalDateTime trxDate;
 
     @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    private String trxCatId;
 
     @Column(nullable = false)
-    private Integer isUsed;
+    private BigDecimal trxAmount;
+
+    @Column(nullable = false)
+    private String trxTarget;
+
+    @Column(nullable = false)
+    private String trxNote;
+
+    @Column(nullable = false)
+    private String trxType;
+
+    @Column(nullable = false)
+    private String createdBy;
 
     @Column(nullable = false)
     private LocalDateTime createdTime;
 
+    @Column(nullable = false)
+    private String updatedBy;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedTime;
 
 }
