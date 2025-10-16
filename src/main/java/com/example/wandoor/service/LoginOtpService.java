@@ -1,8 +1,18 @@
 package com.example.wandoor.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Random;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.example.wandoor.model.entity.OtpVerification;
 import com.example.wandoor.model.entity.RoleManagement;
-import com.example.wandoor.model.entity.UserAuth;
 import com.example.wandoor.model.request.LoginRequest;
 import com.example.wandoor.model.request.VerifyOtpRequest;
 import com.example.wandoor.model.response.LoginResponse;
@@ -13,19 +23,9 @@ import com.example.wandoor.repository.UserAuthRepository;
 import com.example.wandoor.repository.UserOtpVerificationRepository;
 import com.example.wandoor.util.Helpers;
 import com.example.wandoor.util.JwtUtils;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.Random;
-import java.util.UUID;
 
 @Service
 @Log4j2
@@ -57,7 +57,8 @@ public class LoginOtpService{
         }
 
         //  password verification
-        var checkPassword = passwordEncoder.matches(req.password(), userAuth.getPassword());
+        // var checkPassword = passwordEncoder.matches(req.password(), userAuth.getPassword());
+        var checkPassword = req.password().equals(userAuth.getPassword());
         if (!checkPassword) {
             return new LoginResponse(false, "Invalid Credential", null);
         }
@@ -128,4 +129,3 @@ public class LoginOtpService{
         return new VerifyOtpResponse(true, "login berhasil", token, dataUser);
     }
 }
-
