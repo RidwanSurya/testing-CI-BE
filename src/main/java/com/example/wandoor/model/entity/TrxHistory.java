@@ -3,7 +3,6 @@ package com.example.wandoor.model.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class LifegoalsAccount {
+public class TrxHistory {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
@@ -27,40 +26,25 @@ public class LifegoalsAccount {
     private String userId;
 
     @Column(nullable = false)
-    private String cif;
-
-    @Column(nullable = false)
     private String accountNumber;
 
     @Column(nullable = false)
-    private String lifegoalsName;
+    private LocalDateTime trxDate;
 
     @Column(nullable = false)
-    private String lifegoalsCategoryName;
+    private String trxCatId;
 
     @Column(nullable = false)
-    private BigDecimal accountDeposit;
+    private BigDecimal trxAmount;
 
     @Column(nullable = false)
-    private BigDecimal accountTarget;
+    private String trxTarget;
 
     @Column(nullable = false)
-    private String lifegoalsTrxCreationId;
+    private String trxNote;
 
     @Column(nullable = false)
-    private BigDecimal accountTargetAmount;
-
-    @Column(nullable = false)
-    private BigDecimal estimationAmount;
-
-    @Column(nullable = false)
-    private String lifegoalsDescription;
-
-    @Column(nullable = false)
-    private LocalDateTime maturityDate;
-
-    @Column(nullable = false)
-    private LocalDateTime lifegoalsDuration;
+    private String trxType;
 
     @Column(nullable = false)
     private String createdBy;
@@ -73,4 +57,5 @@ public class LifegoalsAccount {
 
     @Column(nullable = false)
     private LocalDateTime updatedTime;
+
 }

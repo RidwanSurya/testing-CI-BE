@@ -3,8 +3,8 @@ package com.example.wandoor.model.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,10 +16,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class LifegoalsAccount {
+public class Account {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
+    @UuidGenerator
     @Column(nullable = false, updatable = false)
     private String id;
 
@@ -27,40 +28,34 @@ public class LifegoalsAccount {
     private String userId;
 
     @Column(nullable = false)
-    private String cif;
-
-    @Column(nullable = false)
     private String accountNumber;
 
     @Column(nullable = false)
-    private String lifegoalsName;
+    private String cif;
 
     @Column(nullable = false)
-    private String lifegoalsCategoryName;
+    private BigDecimal effectiveBalance;
 
     @Column(nullable = false)
-    private BigDecimal accountDeposit;
+    private String accountType;
 
     @Column(nullable = false)
-    private BigDecimal accountTarget;
+    private String subCat;
 
     @Column(nullable = false)
-    private String lifegoalsTrxCreationId;
+    private String currencyCode;
 
     @Column(nullable = false)
-    private BigDecimal accountTargetAmount;
+    private String accountHolderName;
 
     @Column(nullable = false)
-    private BigDecimal estimationAmount;
+    private Integer isMainAccount;
 
     @Column(nullable = false)
-    private String lifegoalsDescription;
+    private String accountStatus;
 
     @Column(nullable = false)
-    private LocalDateTime maturityDate;
-
-    @Column(nullable = false)
-    private LocalDateTime lifegoalsDuration;
+    private Integer isDeleted;
 
     @Column(nullable = false)
     private String createdBy;

@@ -3,10 +3,8 @@ package com.example.wandoor.model.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class LifegoalsAccount {
+public class CardProduct {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
@@ -24,43 +22,19 @@ public class LifegoalsAccount {
     private String id;
 
     @Column(nullable = false)
-    private String userId;
+    private String productType;
 
     @Column(nullable = false)
-    private String cif;
+    private String subCat;
 
     @Column(nullable = false)
-    private String accountNumber;
+    private String productName;
 
     @Column(nullable = false)
-    private String lifegoalsName;
+    private Integer isEligibleProduct;
 
     @Column(nullable = false)
-    private String lifegoalsCategoryName;
-
-    @Column(nullable = false)
-    private BigDecimal accountDeposit;
-
-    @Column(nullable = false)
-    private BigDecimal accountTarget;
-
-    @Column(nullable = false)
-    private String lifegoalsTrxCreationId;
-
-    @Column(nullable = false)
-    private BigDecimal accountTargetAmount;
-
-    @Column(nullable = false)
-    private BigDecimal estimationAmount;
-
-    @Column(nullable = false)
-    private String lifegoalsDescription;
-
-    @Column(nullable = false)
-    private LocalDateTime maturityDate;
-
-    @Column(nullable = false)
-    private LocalDateTime lifegoalsDuration;
+    private Integer isDelete;
 
     @Column(nullable = false)
     private String createdBy;

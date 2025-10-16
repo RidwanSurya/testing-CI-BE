@@ -64,7 +64,7 @@ public class TimeDepositAccount {
     private BigDecimal interestRate;
 
     @Column(nullable = false)
-    private BigDecimal interestPaymentType;
+    private String interestPaymentType;
 
     @Column(nullable = false)
     private String depositAccountStatus;
