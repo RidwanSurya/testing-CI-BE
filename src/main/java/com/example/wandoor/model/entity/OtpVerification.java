@@ -5,6 +5,7 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.NumericBooleanConverter;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ public class OtpVerification {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
+    @UuidGenerator
     @Column(nullable = false)
     private String id;
 
