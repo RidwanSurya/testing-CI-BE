@@ -1,6 +1,10 @@
 package com.example.wandoor.model.entity;
 
+import org.hibernate.annotations.UuidGenerator;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +25,6 @@ public class Savings {
     @EqualsAndHashCode.Include
     @UuidGenerator
     @Column(nullable = false, updatable = false)
-    private account_id;
+    private String account_id;
     
 }

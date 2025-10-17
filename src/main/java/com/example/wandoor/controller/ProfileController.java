@@ -24,34 +24,6 @@ public class ProfileController{
 
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getProfile(@PathVariable String id){
-        Optional<Profile> profileOpt = service.getProfileById(id);
-
-        Map<String, Object> response = new LinkedHashMap<>();
-
-        if (profileOpt.isPresent()) {
-            Profile profile = profileOpt.get();
-            Map<String, Object> filteredProfile = new HashMap<>();
-            filteredProfile.put("id", profile.getId());
-            filteredProfile.put("cif", profile.getCif());
-            filteredProfile.put("username", profile.getUsername());
-            filteredProfile.put("first_name", profile.getFirstName());
-            filteredProfile.put("middle_name", profile.getMiddleName());
-            filteredProfile.put("last_name", profile.getLastName());
-            filteredProfile.put("dob", profile.getDob());
-            filteredProfile.put("phone_number", profile.getPhoneNumber());
-            filteredProfile.put("email_address", profile.getEmailAddress());
-            Map<String, Object> data = new HashMap<>();
-            data.put("profile", filteredProfile);
-
-            response.put("status", true);
-            response.put("message", "Profile retrieved successfully");
-            response.put("data", data);
-
-            return ResponseEntity.ok(response);
-        } else {
-            response.put("status", false);
-            response.put("message", "Profile not found");
-            return ResponseEntity.status(404).body(response);
-        }
+        return service.getProfileResponse(id);
     }
 }
