@@ -1,10 +1,9 @@
 package com.example.wandoor.model.entity;
 
-import com.example.wandoor.model.enums.TrxType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,36 +15,37 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class TrxHistory {
+public class SplitBillMember {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
+    @UuidGenerator
     @Column(nullable = false, updatable = false)
     private String id;
+
+//    @Column(nullable = false)
+//    private String splitBillId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "split_bill_id", nullable = false)
+    private SplitBill splitBill;
 
     @Column(nullable = false)
     private String userId;
 
     @Column(nullable = false)
-    private String accountNumber;
+    private BigDecimal amountShare;
 
     @Column(nullable = false)
-    private LocalDateTime trxDate;
+    private Integer hasPaid = 0;
+
+    private LocalDateTime paymentDate;
 
     @Column(nullable = false)
-    private String trxCatId;
+    private String memberName;
 
     @Column(nullable = false)
-    private BigDecimal trxAmount;
-
-    @Column(nullable = false)
-    private String trxTarget;
-
-    @Column(nullable = false)
-    private String trxNote;
-
-    @Column(nullable = false)
-    private TrxType trxType;
+    private Integer isDeleted = 0;
 
     @Column(nullable = false)
     private String createdBy;

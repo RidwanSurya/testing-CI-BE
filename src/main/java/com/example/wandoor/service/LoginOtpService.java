@@ -40,7 +40,7 @@ public class LoginOtpService{
     private final RoleManagementRepository roleManagementRepository;
     private final JwtUtils jwtUtils;
 
-    private static final Duration OTP_EXPIRED = Duration.ofMinutes(3);
+    private static final Duration OTP_EXPIRED = Duration.ofMinutes(300);
     private static final Duration ISSUE_WINDOW = Duration.ofMinutes(10);
     private static final int ISSUE_LIMIT = 3;
 
@@ -76,8 +76,8 @@ public class LoginOtpService{
         var otpReff = UUID.randomUUID().toString();
 
         // save to table OtpVerification
-        var otpVerification = OtpVerification.builder()
-                .id(otpReff)
+        var ent = OtpVerification.builder()
+//                .id(otpReff)
                 .userId(userAuth.getUserId())
                 .otpCode(otp)
                 .emailTo(userAuth.getEmailAddress())
@@ -85,12 +85,13 @@ public class LoginOtpService{
                 .isUsed(0)
                 .createdTime(LocalDateTime.now())
                 .build();
-        userOtpVerificationRepository.save(otpVerification);
+        ent = userOtpVerificationRepository.save(ent);
+        var otpRef = ent.getId();
 
         // sent OTP by email
         emailService.sendOtp(userAuth.getEmailAddress(), otp);
 
-        return new LoginResponse(true, "Kode OTP telah dikirim ke email Anda", otpReff);
+        return new LoginResponse(true, "Kode OTP telah dikirim ke email Anda", otpRef);
     }
 
     public VerifyOtpResponse verifyOtp(VerifyOtpRequest req) {
