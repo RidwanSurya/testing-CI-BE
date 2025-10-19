@@ -73,11 +73,9 @@ public class LoginOtpService{
 
         // generate OTP
         var otp = String.format("%06d", new Random().nextInt(999999));
-        var otpReff = UUID.randomUUID().toString();
-
         // save to table OtpVerification
         var otpVerification = OtpVerification.builder()
-                .id(otpReff)
+//                .id(otpReff)
                 .userId(userAuth.getUserId())
                 .otpCode(otp)
                 .emailTo(userAuth.getEmailAddress())
@@ -90,35 +88,41 @@ public class LoginOtpService{
         // sent OTP by email
         emailService.sendOtp(userAuth.getEmailAddress(), otp);
 
-        return new LoginResponse(true, "Kode OTP telah dikirim ke email Anda", otpReff);
+        return new LoginResponse(true, "Kode OTP telah dikirim ke email Anda", otpVerification.getId());
     }
 
+    @Transactional
     public VerifyOtpResponse verifyOtp(VerifyOtpRequest req) {
         var ref = UUID.fromString(req.otp_ref());
-        // get row otp
-        var otpRow = userOtpVerificationRepository.findByIdAndIsUsed(req.otp_ref(), 0)
+        var now = LocalDateTime.now();
+
+        var updated = userOtpVerificationRepository.consumeIfValid(req.otp_ref(), req.otp_code(), now);
+        if (updated == 0){
+            var otpRow = userOtpVerificationRepository.findByIdAndIsUsed(req.otp_ref(), 0)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP tidak valid"));
+            if (otpRow.getExpiresAt() != null && otpRow.getExpiresAt().isBefore(now) ){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP expired");
+            }
+                if (otpRow.getIsUsed() != null && otpRow.getIsUsed() == 1) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "OTP sudah digunakan");
+                }
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "OTP salah");
+        }
+
+        // ambil row untuk userId
+        var row = userOtpVerificationRepository.findById(req.otp_ref())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP tidak valid"));
-
-        // cek expired
-        if (otpRow.getExpiresAt().isBefore(LocalDateTime.now())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP expired");
-        }
-
-        // compare otp input and db
-        if (!helpers.safeEquals(otpRow.getOtpCode(), req.otp_code())){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "OTP Salah");
-        }
-
-        // used and make jwt
-        otpRow.setIsUsed(1);
-        userOtpVerificationRepository.save(otpRow);
-
-        var role = roleManagementRepository.findFirstByUserId(otpRow.getUserId())
-                        .map(RoleManagement::getRoleName).orElse("Nasabah");
-        var userData = userAuthRepository.findById(otpRow.getUserId())
+        var role = roleManagementRepository.findFirstByUserId(row.getUserId())
+                .map(RoleManagement::getRoleName).orElse("Nasabah");
+        var userData = userAuthRepository.findById(row.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found"));
 
-        var token = jwtUtils.generateToken(otpRow.getUserId(), role);
+        var token = jwtUtils.generateToken(row.getUserId(), role);
+
+        // used and make jwt
+//        otpRow.setIsUsed(1);
+//        userOtpVerificationRepository.save(otpRow);
+
 
         var dataUser = new VerifyOtpResponse.User(
                 userData.getUserId(),

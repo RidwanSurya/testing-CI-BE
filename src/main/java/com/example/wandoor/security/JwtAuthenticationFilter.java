@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         var header = req.getHeader("Authorization");
         var userIdHeader = req.getHeader("User-Id");
-        var cifHeader = req.getHeader("cif");
+        var cifHeader = req.getHeader("Customer-Id");
 
         if (header == null || !header.startsWith("Bearer ")){
             unauthorized(response, "Unauthorized - Token JWT tidak valid");
