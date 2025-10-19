@@ -1,9 +1,6 @@
 package com.example.wandoor.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.NumericBooleanConverter;
@@ -21,7 +18,7 @@ public class OtpVerification {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
-    @UuidGenerator
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
     private String id;
 
