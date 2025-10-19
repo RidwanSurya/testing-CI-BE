@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RecordBuilder
-public record LifegoalsListResponse(
+public record LifegoalsResponse(
         List<DataLifegoals> dataLifegoalsList
 ) {
 
