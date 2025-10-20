@@ -25,12 +25,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req,
-                              HttpServletResponse response,
-                              FilterChain filterChain)
-        throws ServletException, IOException {
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
         String path = req.getRequestURI();
-        System.out.println("JWT Filter: path=" + req.getServletPath());
+
         if (path.startsWith("/api/auth/")) {
             System.out.println("JWT Filter skipped for: " + path);
             filterChain.doFilter(req, response);
@@ -54,7 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         var token = header.substring(7);
         try {
             var jwt = jwtUtils.validateToken(token);
-            System.out.println("JWT Filter: VALID token for sub=" + jwt.getSubject());
             var userId = jwt.getSubject();
             var role = jwt.getClaim("role").asString();
 
@@ -68,7 +67,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ctx.setCif(cifHeader);
 
         } catch (Exception e) {
-            System.out.println("JWT Filter: INVALID token: " + e.getMessage());
             SecurityContextHolder.clearContext();
             unauthorized(response, "Unauthorized - Token JWT tidak valid");
             return;
