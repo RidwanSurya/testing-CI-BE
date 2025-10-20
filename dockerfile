@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # 3. Salin file JAR aplikasi ke dalam container
-COPY target/myapp.jar app.jar
+COPY target/myapp.jar /app/myapp.jar
 
 # 4. Expose port yang digunakan oleh aplikasi (biasanya 8080)
 EXPOSE 8080
