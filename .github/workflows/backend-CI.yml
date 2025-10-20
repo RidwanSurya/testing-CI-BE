@@ -24,6 +24,10 @@ jobs:
         java-version: '17'
         distribution: 'zulu'  # Gunakan 'openjdk' atau 'zulu' jika Anda menghadapi masalah dengan 'adoptopenjdk'
 
+    # Memberikan izin eksekusi pada gradlew
+    - name: Give execute permission to gradlew
+      run: chmod +x ./gradlew
+      
     # Build dengan Gradle
     - name: Build with Gradle
       run: ./gradlew clean build -x test  # Skip test jika perlu
