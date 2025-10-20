@@ -12,16 +12,6 @@
     build:
       runs-on: ubuntu-latest
 
-    services:
-      # Service untuk database Oracle
-    oracle:
-        image: oracle/database:19.3.0-ee
-        ports:
-          - 1521:1521
-        env:
-          - ORACLE_PASSWORD=root
-        options: --health-cmd="pgrep ora_pmon" --health-interval=30s --health-timeout=10s --health-retries=3
-
       steps:
       # Checkout repository
       - name: Checkout code
