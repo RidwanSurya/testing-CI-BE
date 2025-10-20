@@ -1,53 +1,58 @@
-name: CI/CD for Spring Boot Docker App
+  name: CI/CD for Spring Boot Docker App
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  on:
+    push:
+      branches:
+        - main  # Ganti dengan nama branch yang Anda gunakan untuk production, misalnya 'main' atau 'master'
+    pull_request:
+      branches:
+        - main
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+  jobs:
+    build:
+      runs-on: ubuntu-latest
 
     services:
       # Service untuk database Oracle
-      oracle:
+    oracle:
         image: oracle/database:19.3.0-ee
         ports:
           - 1521:1521
         env:
-          - ORACLE_PASSWORD=yourpassword
+          - ORACLE_PASSWORD=root
         options: --health-cmd="pgrep ora_pmon" --health-interval=30s --health-timeout=10s --health-retries=3
 
-    steps:
-    # Checkout repository
-    - name: Checkout code
-      uses: actions/checkout@v3
+      steps:
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Setup JDK untuk build aplikasi Spring Boot
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'zulu'
+          # Setup JDK untuk build aplikasi Spring Boot
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'  # Gunakan 'openjdk' atau 'zulu' jika Anda menghadapi masalah dengan 'adoptopenjdk'
 
-    # Memberikan izin eksekusi pada gradlew
-    - name: Give execute permission to gradlew
-      run: chmod +x ./gradlew
+      # Memberikan izin eksekusi pada gradlew
+      - name: Give execute permission to gradlew
+        run: chmod +x ./gradlew
 
-    # Build dengan Gradle dan jalankan tes
-    - name: Build and Run Tests with Gradle
-      run: ./gradlew clean build  # Jalankan build dan tes
+      # Build dengan Gradle dan jalankan tests
+      - name: Build and Run Tests with Gradle
+        run: ./gradlew clean build  # Jalankan build dan tes
 
-    # Menjalankan Docker Compose untuk aplikasi dan database
-    - name: Run Docker Compose
-      run: |
-        docker-compose up -d
-        docker-compose ps
+      # Build Docker image
+      - name: Build Docker image
+        run: docker build -t yourusername/springboot-app:$GITHUB_SHA .
 
-    # Push Docker image ke DockerHub
-    - name: Push Docker image to DockerHub
-      run: docker push yourusername/springboot-app:$GITHUB_SHA
+      # Log in to DockerHub (pastikan Anda sudah menyimpan DockerHub secrets di GitHub)
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Push Docker image ke Docker Hub
+      - name: Push Docker image to DockerHub
+        run: docker push yourusername/springboot-app:$GITHUB_SHA
