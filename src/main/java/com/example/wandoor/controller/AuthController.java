@@ -30,7 +30,7 @@ public class AuthController {
     @PostMapping("/verify-otp")
     public ResponseEntity<VerifyOtpResponse> verifyOtp (
             @Valid @RequestBody VerifyOtpRequest req){
-//        System.out.println("otp");
+        System.out.println("otp");
         return ResponseEntity.ok(loginOtpService.verifyOtp(req));
     }
 

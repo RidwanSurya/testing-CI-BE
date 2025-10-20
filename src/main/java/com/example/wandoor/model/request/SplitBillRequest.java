@@ -4,12 +4,12 @@ import io.soabase.recordbuilder.core.RecordBuilder;
 import jakarta.validation.constraints.NotBlank;
 
 @RecordBuilder
-public record LoginRequest(
+public record SplitBillRequest(
         @NotBlank
         String userId,
 
         @NotBlank
-        String password
+        String customerId
 
 ) {
 }

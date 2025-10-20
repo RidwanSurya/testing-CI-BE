@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.math.BigDecimal;
 
 public interface SplitBillMemberRepository extends JpaRepository<SplitBillMember, String> {
@@ -20,4 +21,5 @@ public interface SplitBillMemberRepository extends JpaRepository<SplitBillMember
           AND m.hasPaid = 0
     """)
     BigDecimal sumRemainingForCreator(@Param("userId") String userId, @Param("cif") String cif);
+    List<SplitBillMember> findSplitBillById(String splitBillId);
 }
