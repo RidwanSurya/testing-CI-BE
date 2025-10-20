@@ -1,12 +1,13 @@
 package com.example.wandoor.model.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -15,11 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class SplitBill {
+public class LifegoalsAccount {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
-    @UuidGenerator
     @Column(nullable = false, updatable = false)
     private String id;
 
@@ -33,25 +33,34 @@ public class SplitBill {
     private String accountNumber;
 
     @Column(nullable = false)
-    private String transactionId;
+    private String lifegoalsName;
 
     @Column(nullable = false)
-    private  String splitBillTitle;
+    private String lifegoalsCategoryName;
 
     @Column(nullable = false)
-    private String currency;
+    private BigDecimal accountDeposit;
 
     @Column(nullable = false)
-    private BigDecimal totalAmount;
-
-//    @Column(nullable = false)
-//    private Integer hasPaid = 0;
-//
-//    @Column(nullable = false)
-//    private LocalDateTime paymentTime;
+    private BigDecimal accountTarget;
 
     @Column(nullable = false)
-    private Integer isDeleted = 0;
+    private String lifegoalsTrxCreationId;
+
+    @Column(nullable = false)
+    private BigDecimal accountTargetAmount;
+
+    @Column(nullable = false)
+    private BigDecimal estimationAmount;
+
+    @Column(nullable = false)
+    private String lifegoalsDescription;
+
+    @Column(nullable = false)
+    private LocalDateTime maturityDate;
+
+    @Column(nullable = false)
+    private Integer lifegoalsDuration;
 
     @Column(nullable = false)
     private String createdBy;

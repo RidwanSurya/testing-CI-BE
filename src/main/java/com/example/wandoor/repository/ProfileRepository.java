@@ -7,5 +7,5 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProfileRepository extends JpaRepository<Profile, String> {
-    Optional<Profile> getProfileById(String id);
+    Optional<Profile> findByIdAndCif( String userId, String cif);
 }

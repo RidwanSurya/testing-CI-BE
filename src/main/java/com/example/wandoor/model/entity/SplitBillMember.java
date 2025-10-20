@@ -1,12 +1,12 @@
 package com.example.wandoor.model.entity;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class SplitBill {
+public class SplitBillMember {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
@@ -23,32 +23,26 @@ public class SplitBill {
     @Column(nullable = false, updatable = false)
     private String id;
 
+//    @Column(nullable = false)
+//    private String splitBillId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "split_bill_id", nullable = false)
+    private SplitBill splitBill;
+
     @Column(nullable = false)
     private String userId;
 
     @Column(nullable = false)
-    private String cif;
+    private BigDecimal amountShare;
 
     @Column(nullable = false)
-    private String accountNumber;
+    private Integer hasPaid = 0;
+
+    private LocalDateTime paymentDate;
 
     @Column(nullable = false)
-    private String transactionId;
-
-    @Column(nullable = false)
-    private  String splitBillTitle;
-
-    @Column(nullable = false)
-    private String currency;
-
-    @Column(nullable = false)
-    private BigDecimal totalAmount;
-
-//    @Column(nullable = false)
-//    private Integer hasPaid = 0;
-//
-//    @Column(nullable = false)
-//    private LocalDateTime paymentTime;
+    private String memberName;
 
     @Column(nullable = false)
     private Integer isDeleted = 0;
@@ -64,4 +58,5 @@ public class SplitBill {
 
     @Column(nullable = false)
     private LocalDateTime updatedTime;
+
 }

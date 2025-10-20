@@ -1,12 +1,11 @@
 package com.example.wandoor.model.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -15,43 +14,27 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class SplitBill {
+public class CardProduct {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
-    @UuidGenerator
     @Column(nullable = false, updatable = false)
     private String id;
 
     @Column(nullable = false)
-    private String userId;
+    private String productType;
 
     @Column(nullable = false)
-    private String cif;
+    private String subCat;
 
     @Column(nullable = false)
-    private String accountNumber;
+    private String productName;
 
     @Column(nullable = false)
-    private String transactionId;
+    private Integer isEligibleProduct;
 
     @Column(nullable = false)
-    private  String splitBillTitle;
-
-    @Column(nullable = false)
-    private String currency;
-
-    @Column(nullable = false)
-    private BigDecimal totalAmount;
-
-//    @Column(nullable = false)
-//    private Integer hasPaid = 0;
-//
-//    @Column(nullable = false)
-//    private LocalDateTime paymentTime;
-
-    @Column(nullable = false)
-    private Integer isDeleted = 0;
+    private Integer isDelete;
 
     @Column(nullable = false)
     private String createdBy;
