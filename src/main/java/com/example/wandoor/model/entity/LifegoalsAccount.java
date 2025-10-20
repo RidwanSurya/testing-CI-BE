@@ -60,7 +60,7 @@ public class LifegoalsAccount {
     private LocalDateTime maturityDate;
 
     @Column(nullable = false)
-    private LocalDateTime lifegoalsDuration;
+    private Integer lifegoalsDuration;
 
     @Column(nullable = false)
     private String createdBy;
