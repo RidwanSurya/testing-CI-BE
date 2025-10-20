@@ -22,6 +22,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
+        distribution: 'adoptopenjdk'
 
     # Build aplikasi Spring Boot menggunakan Maven (atau bisa menggunakan Gradle jika pakai Gradle)
     - name: Build with Maven
@@ -41,7 +42,3 @@ jobs:
     # Push Docker image ke Docker Hub
     - name: Push Docker image to DockerHub
       run: docker push yourusername/springboot-app:$GITHUB_SHA
-
-    # (Optional) Deploy ke server atau layanan lainnya
-    # - name: Deploy to Server
-    #   run: ssh user@server 'docker pull yourusername/springboot-app:$GITHUB_SHA && docker run -d -p 8080:8080 yourusername/springboot-app:$GITHUB_SHA'
