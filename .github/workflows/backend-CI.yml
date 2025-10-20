@@ -22,7 +22,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'openjdk'  # Gunakan 'openjdk' atau 'zulu' jika Anda menghadapi masalah dengan 'adoptopenjdk'
+        distribution: 'zulu'  # Gunakan 'openjdk' atau 'zulu' jika Anda menghadapi masalah dengan 'adoptopenjdk'
 
     # Build aplikasi Spring Boot menggunakan Maven (atau bisa menggunakan Gradle jika pakai Gradle)
     - name: Build with Maven
