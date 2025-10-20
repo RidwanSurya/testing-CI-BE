@@ -83,8 +83,7 @@ public class LoginOtpService{
                 .isUsed(0)
                 .createdTime(LocalDateTime.now())
                 .build();
-        ent = userOtpVerificationRepository.save(ent);
-        var otpRef = ent.getId();
+        userOtpVerificationRepository.save(otpVerification);
 
         // sent OTP by email
         emailService.sendOtp(userAuth.getEmailAddress(), otp);
