@@ -1,39 +1,14 @@
-# Gunakan image Node.js untuk build aplikasi
+# 1. Pilih base image yang sesuai, gunakan openjdk untuk menjalankan aplikasi Java
+FROM openjdk:17-jdk-slim
 
-FROM node:18-alpine AS build
-
-# Set direktori kerja di container
-
+# 2. Set working directory dalam container
 WORKDIR /app
 
-# Salin file package.json dan package-lock.json
+# 3. Salin file JAR aplikasi ke dalam container
+COPY target/myapp.jar app.jar
 
-COPY package*.json ./
+# 4. Expose port yang digunakan oleh aplikasi (biasanya 8080)
+EXPOSE 8080
 
-# Install dependencies
-
-RUN npm install
-
-# Salin semua source code ke container
-
-COPY . .
-
-# Build project React
-
-RUN npm run build
-
-# Gunakan Nginx untuk menyajikan hasil build
-
-FROM nginx:stable-alpine
-
-# Salin hasil build React ke folder default Nginx
-
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Ekspos port 3000
-
-EXPOSE 3000
-
-# Jalankan Nginx
-
-CMD ["nginx", "-g", "daemon off;"]
+# 5. Tentukan perintah untuk menjalankan aplikasi Spring Boot
+ENTRYPOINT ["java", "-jar", "app.jar"]
