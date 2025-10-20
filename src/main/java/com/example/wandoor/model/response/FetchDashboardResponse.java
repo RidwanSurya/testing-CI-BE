@@ -1,5 +1,6 @@
 package com.example.wandoor.model.response;
 
+import com.example.wandoor.model.enums.AccountStatus;
 import io.soabase.recordbuilder.core.RecordBuilder;
 
 import java.math.BigDecimal;
@@ -44,7 +45,7 @@ public record FetchDashboardResponse(
             BigDecimal effectiveBalance,
 //            String debitCardNumber,
             String accountProductName,
-            String cardStatus,
+            AccountStatus accountStatus,
             LocalDateTime issuedTime
     ){}
 }

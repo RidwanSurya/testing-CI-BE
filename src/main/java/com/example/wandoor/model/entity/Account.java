@@ -1,8 +1,7 @@
 package com.example.wandoor.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.example.wandoor.model.enums.AccountStatus;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -51,8 +50,9 @@ public class Account {
     @Column(nullable = false)
     private Integer isMainAccount;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String accountStatus;
+    private AccountStatus accountStatus;
 
     @Column(nullable = false)
     private Integer isDeleted;

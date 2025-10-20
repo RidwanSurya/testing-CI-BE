@@ -1,9 +1,11 @@
 package com.example.wandoor.service;
 
+import com.example.wandoor.config.RequestContext;
 import com.example.wandoor.model.entity.Account;
 import com.example.wandoor.model.entity.LifegoalsAccount;
 import com.example.wandoor.model.entity.SplitBill;
 import com.example.wandoor.model.entity.TimeDepositAccount;
+import com.example.wandoor.model.enums.AccountStatus;
 import com.example.wandoor.model.enums.TrxType;
 import com.example.wandoor.model.response.FetchDashboardResponse;
 import com.example.wandoor.repository.*;
@@ -33,19 +35,21 @@ public class DashboardService {
     private final SplitBillMemberRepository splitBillMemberRepository;
 
     @Transactional
-    public FetchDashboardResponse fetchDashboard(String userId, String cif) {
+    public FetchDashboardResponse fetchDashboard() {
+        var userId = RequestContext.get().getUserId();
+        var cif = RequestContext.get().getCif();
+
         // timeDeposit + account + lifegoals + pension_funds
-        var userExists = profileRepository.findByCif(cif)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PROFILE TIDAK DITEMUKAN"));
-//        if (!userExists){
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-//        }
+        // verify user
+        var userExists = profileRepository.findByIdAndCif(userId, cif)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         var timeDeposit = timeDepositRepository.findByUserIdAndCif(userId,  cif);
         var account = accountRepository.findByUserIdAndCif(userId, cif);
         var lifegoals = lifegoalsAccountRepository.findByUserIdAndCif(userId, cif);
         // add pensiun
-        var accounts = accountRepository.findByUserIdAndCif(userId, cif);
+        var statuses = List.of(AccountStatus.BUKA, AccountStatus.BARU);
+        List<Account> accounts = accountRepository.fetchActiveAccounts(userId, cif, statuses);
 
         var totalTimeDeposit = sum(timeDeposit, TimeDepositAccount::getEffectiveBalance);
         var totalAccount = sum(account, Account::getEffectiveBalance);
@@ -80,7 +84,7 @@ public class DashboardService {
                         a.getEffectiveBalance(),
                         a.getSubCat(),
                         a.getAccountStatus(),
-                        null
+                        a.getCreatedTime()
                 )).toList();
 
 

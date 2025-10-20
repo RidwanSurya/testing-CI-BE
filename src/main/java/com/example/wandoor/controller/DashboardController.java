@@ -19,10 +19,9 @@ public class DashboardController {
     public final DashboardService dashboardService;
 
     @GetMapping("fetch-dashboard")
-    public ResponseEntity<FetchDashboardResponse> fetchDashboard(Authentication auth,
-                                                                 @RequestHeader("cif") String cif) {
-        String userId = (String) auth.getPrincipal(); // ini di-set oleh filter JWT
-        return ResponseEntity.ok(dashboardService.fetchDashboard(userId, cif));
+    public ResponseEntity<FetchDashboardResponse> fetchDashboard() {
+        var response = dashboardService.fetchDashboard();
+        return ResponseEntity.ok(response);
     }
 
 }
