@@ -3,8 +3,10 @@ package com.example.wandoor.model.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,12 +16,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-
-public class SplitBill {
+public class LifegoalsAccount {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String id;
 
     @Column(nullable = false)
@@ -32,34 +33,43 @@ public class SplitBill {
     private String accountNumber;
 
     @Column(nullable = false)
-    private String transactionId;
+    private String lifegoalsName;
 
     @Column(nullable = false)
-    private String splitBillTitle;
-
-    @Column(nullable = true)
-    private String currency = "IDR";
+    private String lifegoalsCategoryName;
 
     @Column(nullable = false)
-    private Number totalAmount;
-
-    @Column(nullable = true)
-    private Boolean hasPaid = false;
+    private BigDecimal accountDeposit;
 
     @Column(nullable = false)
-    private LocalDateTime paymentTime;
-
-    @Column(nullable=false)
-    private Boolean is_deleted = false;
+    private BigDecimal accountTarget;
 
     @Column(nullable = false)
-    private String createdBy = "SYSTEM";
+    private String lifegoalsTrxCreationId;
+
+    @Column(nullable = false)
+    private BigDecimal accountTargetAmount;
+
+    @Column(nullable = false)
+    private BigDecimal estimationAmount;
+
+    @Column(nullable = false)
+    private String lifegoalsDescription;
+
+    @Column(nullable = false)
+    private LocalDateTime maturityDate;
+
+    @Column(nullable = false)
+    private Integer lifegoalsDuration;
+
+    @Column(nullable = false)
+    private String createdBy;
 
     @Column(nullable = false)
     private LocalDateTime createdTime;
 
     @Column(nullable = false)
-    private String updatedBy = "SYSTEM";
+    private String updatedBy;
 
     @Column(nullable = false)
     private LocalDateTime updatedTime;

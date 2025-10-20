@@ -1,44 +1,50 @@
 package com.example.wandoor.model.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.type.NumericBooleanConverter;
 
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Builder
-@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class OtpVerification {
+public class CardProduct {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private String id;
 
     @Column(nullable = false)
-    private String userId;
+    private String productType;
 
     @Column(nullable = false)
-    private String otpCode;
+    private String subCat;
 
     @Column(nullable = false)
-    private String emailTo;
+    private String productName;
 
     @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    private Integer isEligibleProduct;
 
     @Column(nullable = false)
-    private Integer isUsed;
+    private Integer isDelete;
+
+    @Column(nullable = false)
+    private String createdBy;
 
     @Column(nullable = false)
     private LocalDateTime createdTime;
 
+    @Column(nullable = false)
+    private String updatedBy;
 
+    @Column(nullable = false)
+    private LocalDateTime updatedTime;
 }
