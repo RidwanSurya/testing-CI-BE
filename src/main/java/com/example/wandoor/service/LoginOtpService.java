@@ -40,7 +40,7 @@ public class LoginOtpService{
     private final RoleManagementRepository roleManagementRepository;
     private final JwtUtils jwtUtils;
 
-    private static final Duration OTP_EXPIRED = Duration.ofMinutes(3);
+    private static final Duration OTP_EXPIRED = Duration.ofMinutes(300);
     private static final Duration ISSUE_WINDOW = Duration.ofMinutes(10);
     private static final int ISSUE_LIMIT = 3;
 
@@ -83,7 +83,8 @@ public class LoginOtpService{
                 .isUsed(0)
                 .createdTime(LocalDateTime.now())
                 .build();
-        userOtpVerificationRepository.save(otpVerification);
+        ent = userOtpVerificationRepository.save(ent);
+        var otpRef = ent.getId();
 
         // sent OTP by email
         emailService.sendOtp(userAuth.getEmailAddress(), otp);
