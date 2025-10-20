@@ -32,9 +32,9 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew clean build -x test  # Skip test jika perlu
 
+    - name: Build Docker Image
+      run: docker build -t wanndirection/springboot-app:${GITHUB_SHA} .
     # Build Docker image
-    - name: Build Docker image
-      run: docker build -t yourusername/springboot-app:$GITHUB_SHA .
 
     # Log in to DockerHub (pastikan Anda sudah menyimpan DockerHub secrets di GitHub)
     - name: Log in to DockerHub
