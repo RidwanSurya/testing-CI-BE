@@ -24,9 +24,9 @@ jobs:
         java-version: '17'
         distribution: 'zulu'  # Gunakan 'openjdk' atau 'zulu' jika Anda menghadapi masalah dengan 'adoptopenjdk'
 
-    # Build aplikasi Spring Boot menggunakan Maven (atau bisa menggunakan Gradle jika pakai Gradle)
-    - name: Build with Maven
-      run: mvn clean package -DskipTests
+    # Build dengan Gradle
+    - name: Build with Gradle
+      run: ./gradlew clean build -x test  # Skip test jika perlu
 
     # Build Docker image
     - name: Build Docker image
