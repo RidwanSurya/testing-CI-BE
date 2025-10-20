@@ -66,24 +66,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ctx.setUserId(userIdHeader);
             ctx.setCif(cifHeader);
 
+
+            try{
+                filterChain.doFilter(req, response);
+            } finally {
+                RequestContext.clear();
+                SecurityContextHolder.clearContext();;
+            }
+
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
             unauthorized(response, "Unauthorized - Token JWT tidak valid");
-            return;
         }
-
-        try {
-            filterChain.doFilter(req, response);
-        } finally {
-            RequestContext.clear();
-        }
-
-        filterChain.doFilter(req, response);
     }
 
     private void unauthorized(HttpServletResponse res, String msg) throws IOException {
+        if (res.isCommitted()) return;;
+        res.resetBuffer();
         res.setStatus(HttpStatus.UNAUTHORIZED.value());
+        res.setCharacterEncoding("UTF-8");
         res.setContentType("application/json");
         res.getWriter().write("{\"status\":false,\"message\":\"" + msg + "\"}");
+        res.flushBuffer();
     }
 }
