@@ -27,10 +27,10 @@ jobs:
     # Memberikan izin eksekusi pada gradlew
     - name: Give execute permission to gradlew
       run: chmod +x ./gradlew
-      
-    # Build dengan Gradle
-    - name: Build with Gradle
-      run: ./gradlew clean build -x test  # Skip test jika perlu
+
+    # Build dengan Gradle dan jalankan tests
+    - name: Build and Run Tests with Gradle
+      run: ./gradlew clean build  # Jalankan build dan tes
 
     # Build Docker image
     - name: Build Docker image
