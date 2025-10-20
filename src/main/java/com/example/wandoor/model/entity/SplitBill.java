@@ -1,11 +1,12 @@
 package com.example.wandoor.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -14,12 +15,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-
 public class SplitBill {
     @Id
     @ToString.Include
     @EqualsAndHashCode.Include
-    @Column(nullable = false)
+    @UuidGenerator
+    @Column(nullable = false, updatable = false)
     private String id;
 
     @Column(nullable = false)
@@ -35,31 +36,31 @@ public class SplitBill {
     private String transactionId;
 
     @Column(nullable = false)
-    private String splitBillTitle;
-
-    @Column(nullable = true)
-    private String currency = "IDR";
+    private  String splitBillTitle;
 
     @Column(nullable = false)
-    private Number totalAmount;
-
-    @Column(nullable = true)
-    private Boolean hasPaid = false;
+    private String currency;
 
     @Column(nullable = false)
-    private LocalDateTime paymentTime;
+    private BigDecimal totalAmount;
 
-    @Column(nullable=false)
-    private Boolean is_deleted = false;
+//    @Column(nullable = false)
+//    private Integer hasPaid = 0;
+//
+//    @Column(nullable = false)
+//    private LocalDateTime paymentTime;
 
     @Column(nullable = false)
-    private String createdBy = "SYSTEM";
+    private Integer isDeleted = 0;
+
+    @Column(nullable = false)
+    private String createdBy;
 
     @Column(nullable = false)
     private LocalDateTime createdTime;
 
     @Column(nullable = false)
-    private String updatedBy = "SYSTEM";
+    private String updatedBy;
 
     @Column(nullable = false)
     private LocalDateTime updatedTime;
