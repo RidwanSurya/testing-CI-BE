@@ -12,6 +12,7 @@ public record SplitBillsListResponse(
     public record SplitBillData (
         String splitBillId,
         String splitBillTitle,
+        String transactionId,
         String currency,
         BigDecimal totalBill,
         BigDecimal remainingBillAmount,
