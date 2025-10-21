@@ -1,5 +1,6 @@
 package com.example.wandoor.model.response;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record DepositResponse(
@@ -10,7 +11,7 @@ public record DepositResponse(
     public record DepositData(
         String fundId,
         String title,
-        Integer totalBalance,
+        BigDecimal totalBalance,
         Integer countAccounts,
         java.util.List<Items> items
     ) {}
@@ -18,10 +19,10 @@ public record DepositResponse(
     public record Items(
         String itemId,
         String depositAccountNumber,
-        Integer balance,
+        BigDecimal balance,
         Integer tenorMonths,
-        LocalDateTime maturityDate,
-        Double interestRate,
+        String maturityDate,
+        BigDecimal interestRate,
         String status
     ) {}
 }
