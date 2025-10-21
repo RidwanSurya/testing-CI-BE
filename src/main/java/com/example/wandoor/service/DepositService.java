@@ -1,5 +1,6 @@
 package com.example.wandoor.service;
 
+import com.example.wandoor.config.RequestContext;
 import com.example.wandoor.model.entity.TimeDepositAccount;
 import com.example.wandoor.model.response.DepositResponse;
 import com.example.wandoor.repository.DepositRepository;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,9 +24,12 @@ public class DepositService {
 
     private final DepositRepository depositRepository;
     
-    public DepositResponse fetchDeposit(String userIdHeader, String cif, String userId){
+    public DepositResponse fetchDeposit(){
+        var userId = RequestContext.get().getUserId();
+        var cif = RequestContext.get().getCif();
+
         // logic - getAllList by Id
-        List<TimeDepositAccount> deposits = depositRepository.getDepositByUserId(userId);
+        List<TimeDepositAccount> deposits = depositRepository.findByUserIdAndCif(userId, cif);
         if (deposits.isEmpty()) {
             throw new RuntimeException("Deposit dengan ID " + userId + " tidak ditemukan");
         }
@@ -31,11 +37,9 @@ public class DepositService {
         var fund_id = "AGG_TIMEDEPOSITS_USR001 -> Ini dapet dari mana??";
         var title = "Time Deposits -> ini juga dapet dari mana?";
         // ✅ Hitung total balance dan jumlah akun
-        int totalBalance = 0;
-        for (TimeDepositAccount deposit : deposits) {
-            totalBalance += deposit.getEffectiveBalance();
-        }
-
+        BigDecimal totalBalance = deposits.stream()
+                .map(td -> td.getEffectiveBalance() == null ? BigDecimal.ZERO : td.getEffectiveBalance())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         var countAccounts = deposits.size();
 
@@ -45,9 +49,11 @@ public class DepositService {
             items.add(new DepositResponse.Items(
                     d.getId(),
                     d.getDepositAccountNumber(),
-                    d.getEffectiveBalance(),
+                    d.getEffectiveBalance() == null ? BigDecimal.ZERO : d.getEffectiveBalance(),
                     d.getTenorMonths(),
-                    d.getMaturityDate(),
+                    d.getMaturityDate() == null
+                            ? null
+                            : d.getMaturityDate().atOffset(ZoneOffset.UTC).toString(),
                     d.getInterestRate(),
                     d.getDepositAccountStatus()
             ));

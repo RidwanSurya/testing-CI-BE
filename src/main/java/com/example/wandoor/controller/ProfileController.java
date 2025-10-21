@@ -1,6 +1,7 @@
 package com.example.wandoor.controller;
 import java.util.Map;
 
+import com.example.wandoor.model.response.ProfileResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.wandoor.service.ProfileService;
 
 @RestController
-@RequestMapping("/api/profile")
+@RequestMapping("/api/v1")
 public class ProfileController{
     private final ProfileService service;
 
@@ -18,8 +19,9 @@ public class ProfileController{
         this.service = service;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> getProfile(@PathVariable String id){
-        return service.getProfileResponse(id);
+    @GetMapping("profile")
+    public ResponseEntity<ProfileResponse> getProfile(){
+       var response = service.getProfile();
+               return ResponseEntity.ok(response);
     }
 }

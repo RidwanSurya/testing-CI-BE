@@ -1,5 +1,6 @@
 package com.example.wandoor.model.response;
 import java.security.Timestamp;
+import java.time.LocalDateTime;
 
 public record ProfileResponse (
     boolean status,
@@ -13,7 +14,7 @@ public record ProfileResponse (
         String first_name,
         String middle_name,
         String lastname,
-        Timestamp dob,
+        LocalDateTime dob,
         Number phone_number,
         String email_address
     ){}

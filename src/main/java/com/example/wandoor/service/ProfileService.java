@@ -5,69 +5,46 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.example.wandoor.config.RequestContext;
+import com.example.wandoor.model.response.ProfileResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.wandoor.repository.ProfileRepository;
 import com.example.wandoor.model.entity.Profile;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ProfileService {
     private final ProfileRepository repository;
 
-    public ProfileService(ProfileRepository repository){
+    public ProfileService(ProfileRepository repository) {
         this.repository = repository;
     }
-
-    public Object getProfile(String id){
-        return repository.getProfileById(id);
-    }
-
-    // 404 Not Found Exception
-    public static class ProfileNotFoundException extends RuntimeException{
-        public ProfileNotFoundException(String message){
-            super(message);
-        }
-    }
-
-    // 401 Unauthorize Exception
-    public static class UnauthorizeException extends RuntimeException{
-        public UnauthorizeException(String message){
-            super(message);
-        }
-    }
     
-    public ResponseEntity<Map<String, Object>> getProfileResponse(String id){
-        Map<String, Object> response = new LinkedHashMap<>();
+    public ProfileResponse getProfile(){
+        var userId = RequestContext.get().getUserId();
+        var cif = RequestContext.get().getCif();
 
-        Optional<Profile> profileOpt = repository.findById(id);
-        if (profileOpt.isPresent()) {
-            Profile profile = profileOpt.get();
+        var userExists =  repository.findByIdAndCif(userId, cif)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-            Map<String, Object> filteredProfile = new HashMap<>();
-            filteredProfile.put("id", profile.getId());
-            filteredProfile.put("cif", profile.getCif());
-            filteredProfile.put("username", profile.getUsername());
-            filteredProfile.put("first_name", profile.getFirstName());
-            filteredProfile.put("middle_name", profile.getMiddleName());
-            filteredProfile.put("last_name", profile.getLastName());
-            filteredProfile.put("dob", profile.getDob());
-            filteredProfile.put("phone_number", profile.getPhoneNumber());
-            filteredProfile.put("email_address", profile.getEmailAddress());
+        var data =  new ProfileResponse.Data(
+                userExists.getId(),
+                userExists.getCif(),
+                userExists.getUsername(),
+                userExists.getFirstName(),
+                userExists.getMiddleName(),
+                userExists.getLastName(),
+                userExists.getDob(),
+                userExists.getPhoneNumber(),
+                userExists.getEmailAddress()
+        );
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("profile", filteredProfile);
-
-            response.put("status", true);
-            response.put("message", "Profile retrieved successfully");
-            response.put("data", data);
-
-            return ResponseEntity.ok(response);
-
-        } else {
-            response.put("status", false);
-            response.put("message", "Profile not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+        return new ProfileResponse(
+                true,
+                "Profile retrieved successfully",
+                data
+        );
     }
 }
