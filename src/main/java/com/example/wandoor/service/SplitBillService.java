@@ -56,7 +56,7 @@ public class SplitBillService {
                     countUnpaid++;
                 }
 
-                // Tambahkan ke member detaili
+                // Tambahkan ke member detail
                 SplitBillsListResponse.SplitBillData.SplitBillMemberDetail memberDetail =
                         new SplitBillsListResponse.SplitBillData.SplitBillMemberDetail(
                                 member.getMemberName(),
