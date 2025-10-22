@@ -41,7 +41,7 @@ public class DplkService {
                 acc -> {
                     var initialDeposit = acc.getDplkInitialDeposit();
                     var growth = randomGrowth();
-                    var years = calculateYearsSince(acc.getCratedTime());
+                    var years = calculateYearsSince(acc.getCreatedTime());
                     var accumulated = calculateAccumulated(initialDeposit, growth, years);
 
                     return  new DplkListResponse.Data.Items(
@@ -49,7 +49,7 @@ public class DplkService {
                             acc.getAccountNumberDplk(),
                             initialDeposit,
                             null,
-                            acc.getCurrenyCode(),
+                            acc.getCurrencyCode(),
                             growth,
                             accumulated
                     );

@@ -35,7 +35,7 @@ public class DplkAccount {
     private String accountNumberDplk;
 
     @Column(nullable = false)
-    private String currenyCode;
+    private String currencyCode;
 
     @Column(nullable = false)
     private String dplkProductName;
@@ -44,13 +44,13 @@ public class DplkAccount {
     private BigDecimal dplkInitialDeposit;
 
     @Column(nullable = false)
-    private String produkType;
+    private String productType;
 
     @Column(nullable = false)
     private String createdBy;
 
     @Column(nullable = false)
-    private LocalDateTime cratedTime;
+    private LocalDateTime createdTime;
 
     @Column(nullable = false)
     private String updatedBy;
