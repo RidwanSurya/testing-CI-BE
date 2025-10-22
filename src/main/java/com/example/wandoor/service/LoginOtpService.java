@@ -32,7 +32,7 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class LoginOtpService{
     private final UserAuthRepository userAuthRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(5);
     private final UserOtpVerificationRepository userOtpVerificationRepository;
     private final EmailService emailService;
     private final Helpers helpers;
@@ -47,9 +47,10 @@ public class LoginOtpService{
 
     @Transactional
     public LoginResponse login (LoginRequest req){
+
         // any userId in db?
         var userAuth = userAuthRepository.findByUsername(req.username())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "UserId atau password salah"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username atau Password salah"));
 
         // cek apakah userAuth di block
         if (userAuth.getIsUserBlocked() != null && userAuth.getIsUserBlocked() == 1) {
@@ -57,10 +58,9 @@ public class LoginOtpService{
         }
 
         //  password verification
-        // var checkPassword = passwordEncoder.matches(req.password(), userAuth.getPassword());
-        var checkPassword = req.password().equals(userAuth.getPassword());
+         var checkPassword = passwordEncoder.matches(req.password(), userAuth.getPassword());
         if (!checkPassword) {
-            return new LoginResponse(false, "Invalid Credential", null);
+            throw  new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username atau Password salah");
         }
 
         // anti spam email per user
