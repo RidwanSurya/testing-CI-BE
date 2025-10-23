@@ -45,4 +45,4 @@ jobs:
 
     # Push Docker image ke Docker Hub
     - name: Push Docker image to DockerHub
-      run: docker push yourusername/wanndirection/testingci-be:$GITHUB_SHA
+      run: docker push wanndirection/testingci-be:backend-latest
