@@ -15,14 +15,20 @@ services:
     networks:
       - wandoor-network
     healthcheck:
-      test: ["CMD-SHELL", "echo 'SELECT 1 FROM dual;' | sqlplus -s system/root@//localhost:1521/XEPDB1 || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "echo 'SELECT 1 FROM dual;' | sqlplus -s system/root@//localhost:1521/XEPDB1 || exit 1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 10
       start_period: 30s
 
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: wandoor-backend
     ports:
       - "8080:8080"
@@ -31,6 +37,13 @@ services:
         condition: service_healthy
     networks:
       - wandoor-network
+    # Tambahkan healthcheck untuk backend juga
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
 networks:
   wandoor-network:
