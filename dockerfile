@@ -1,14 +1,28 @@
-# 1. Pilih base image yang sesuai, gunakan openjdk untuk menjalankan aplikasi Java
-FROM openjdk:17-jdk-slim
-
-# 2. Set working directory dalam container
+## Stage 1: Build aplikasi Spring Boot menggunakan Gradle
+FROM gradle:8.5-jdk17 AS builder
 WORKDIR /app
 
-# 3. Salin file JAR aplikasi ke dalam container
-COPY ./target/myapp.jar /app/myapp.jar
+# Salin semua file proyek ke container builder
+COPY . .
 
-# 4. Expose port yang digunakan oleh aplikasi (biasanya 8080)
+# Build tanpa menjalankan test
+RUN gradle clean build -x test
+
+# Stage 2: Jalankan aplikasi dengan image OpenJDK ringan
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+
+# Salin file .jar hasil build dari stage sebelumnya
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+# Expose port aplikasi Spring Boot (default: 8080)
 EXPOSE 8080
 
-# 5. Tentukan perintah untuk menjalankan aplikasi Spring Boot
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Environment variable untuk koneksi ke Oracle (opsional, bisa di override lewat compose/env)
+ENV SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle-db-app:1521/wandoor_db \
+    SPRING_DATASOURCE_USERNAME=wandoor \
+    SPRING_DATASOURCE_PASSWORD=root \
+    SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+# Jalankan aplikasi
+ENTRYPOINT ["java", "-jar", "app.jar"]
