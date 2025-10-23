@@ -1,6 +1,6 @@
 package com.example.wandoor.model.entity;
 
-import com.example.wandoor.model.enums.TrxType;
+import com.example.wandoor.model.enums.DebitCredit;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -36,7 +36,7 @@ public class TrxHistory {
     private String trxCatId;
 
     @Column(nullable = false)
-    private BigDecimal trxAmount;
+    private BigDecimal transactionAmount;
 
     @Column(nullable = false)
     private String trxTarget;
@@ -45,7 +45,7 @@ public class TrxHistory {
     private String trxNote;
 
     @Column(nullable = false)
-    private TrxType trxType;
+    private DebitCredit debitCredit;
 
     @Column(nullable = false)
     private String createdBy;
