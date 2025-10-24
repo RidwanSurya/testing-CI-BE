@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 public interface TrxHistoryRepository extends JpaRepository<TrxHistory, String> {
     @Query("""
@@ -20,4 +21,7 @@ public interface TrxHistoryRepository extends JpaRepository<TrxHistory, String> 
 //            @Param("cif") String cif,
             @Param("debitCredit") DebitCredit debitCredit
     );
+
+
+    Optional<TrxHistory> findByIdAndAccountNumber(String id, String accountNumber);
 }

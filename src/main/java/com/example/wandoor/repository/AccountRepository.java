@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, String> {
     List<Account> findByUserIdAndCif(String userId, String cif);
+    Optional<Account> findByUserIdAndCifAndAccountNumber(String userId, String cif, String accountNumber);
 
     @Modifying
     @Query("""
