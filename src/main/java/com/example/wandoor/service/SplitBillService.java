@@ -3,9 +3,7 @@ package com.example.wandoor.service;
 import com.example.wandoor.config.RequestContext;
 import com.example.wandoor.model.entity.SplitBill;
 import com.example.wandoor.model.entity.SplitBillMember;
-import com.example.wandoor.model.entity.TimeDepositAccount;
 import com.example.wandoor.model.request.SplitBillDetailRequest;
-import com.example.wandoor.model.response.DepositResponse;
 import com.example.wandoor.model.response.SplitBillDetailResponse;
 import com.example.wandoor.model.response.SplitBillsListResponse;
 import com.example.wandoor.repository.ProfileRepository;
@@ -18,10 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor

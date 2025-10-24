@@ -8,20 +8,20 @@ public record DepositResponse(
     DepositData data
 ) {
     public record DepositData(
-        String fund_id,
+        String fundId,
         String title,
-        BigDecimal total_balance,
-        Integer count_accounts,
+        BigDecimal totalBalance,
+        Integer countAccounts,
         List<Items> items
     ) {}
 
     public record Items(
-        String item_id,
-        String deposit_account_number,
+        String itemId,
+        String depositAccountNumber,
         BigDecimal balance,
-        Integer tenor_months,
-        String maturity_date,
-        BigDecimal interest_rate,
+        Integer tenorMonths,
+        String maturityDate,
+        BigDecimal interestRate,
         String status
     ) {}
 }
