@@ -3,9 +3,9 @@ import jakarta.validation.constraints.NotBlank;
 
 public record SplitBillDetailRequest(
     @NotBlank
-    String split_bill_id,
+    String splitBillId,
 
     @NotBlank
-    String transaction_id
+    String transactionId
     ) {
 }

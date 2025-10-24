@@ -47,7 +47,6 @@ public class LoginOtpService{
 
     @Transactional
     public LoginResponse login (LoginRequest req){
-        System.out.println(passwordEncoder.encode("123456"));
         // any userId in db?
         var userAuth = userAuthRepository.findByUsername(req.username())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username atau Password salah"));

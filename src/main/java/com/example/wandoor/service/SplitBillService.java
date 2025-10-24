@@ -94,12 +94,12 @@ public class SplitBillService {
         var userId = RequestContext.get().getUserId();
         var cif = RequestContext.get().getCif();
 
-        var transaction = splitBillRepository.findByTransactionId(request.transaction_id());
+        var transaction = splitBillRepository.findByTransactionId(request.transactionId());
         if (transaction.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
         }
 
-        var members = splitBillMemberRepository.findAllBySplitBillId(request.split_bill_id());
+        var members = splitBillMemberRepository.findAllBySplitBillId(request.splitBillId());
         if (members.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
         }
