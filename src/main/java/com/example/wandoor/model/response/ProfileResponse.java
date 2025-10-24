@@ -13,7 +13,7 @@ public record ProfileResponse (
         String username,
         String first_name,
         String middle_name,
-        String lastname,
+        String last_name,
         LocalDateTime dob,
         Number phone_number,
         String email_address

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 @Service
 @RequiredArgsConstructor
 public class DepositService {
-
     private final DepositRepository depositRepository;
     
     public DepositResponse fetchDeposit(){
@@ -34,8 +33,8 @@ public class DepositService {
             throw new RuntimeException("Deposit dengan ID " + userId + " tidak ditemukan");
         }
 
-        var fund_id = "AGG_TIMEDEPOSITS_USR001 -> Ini dapet dari mana??";
-        var title = "Time Deposits -> ini juga dapet dari mana?";
+        var fund_id = cif;
+        var title = "Time Deposits";
         // ✅ Hitung total balance dan jumlah akun
         BigDecimal totalBalance = deposits.stream()
                 .map(td -> td.getEffectiveBalance() == null ? BigDecimal.ZERO : td.getEffectiveBalance())

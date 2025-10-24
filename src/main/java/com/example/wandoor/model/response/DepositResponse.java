@@ -1,7 +1,6 @@
 package com.example.wandoor.model.response;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 public record DepositResponse(
     boolean status,
@@ -9,20 +8,20 @@ public record DepositResponse(
     DepositData data
 ) {
     public record DepositData(
-        String fundId,
+        String fund_id,
         String title,
-        BigDecimal totalBalance,
-        Integer countAccounts,
-        java.util.List<Items> items
+        BigDecimal total_balance,
+        Integer count_accounts,
+        List<Items> items
     ) {}
 
     public record Items(
-        String itemId,
-        String depositAccountNumber,
+        String item_id,
+        String deposit_account_number,
         BigDecimal balance,
-        Integer tenorMonths,
-        String maturityDate,
-        BigDecimal interestRate,
+        Integer tenor_months,
+        String maturity_date,
+        BigDecimal interest_rate,
         String status
     ) {}
 }
