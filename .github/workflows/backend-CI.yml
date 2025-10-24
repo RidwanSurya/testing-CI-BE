@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: wanndirection/testingci-be:backend-latest
+          tags: jrtr1/wandoor-backend-app:backend-latest
 
       # Push Docker image ke Docker Hub
       # - name: Push Docker image to DockerHub
