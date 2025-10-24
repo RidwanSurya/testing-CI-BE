@@ -16,7 +16,7 @@ WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 
 # Expose port aplikasi Spring Boot (default: 8080)
-EXPOSE 8080
+EXPOSE 8081
 
 # Environment variable untuk koneksi ke Oracle
 ENV SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle-db-app:1521/wandoor_db \
