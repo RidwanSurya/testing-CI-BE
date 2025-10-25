@@ -10,7 +10,7 @@ description = "Final Project Dashboard Mini Internet Banking ODP BNI 343"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(22)
 	}
 }
 
