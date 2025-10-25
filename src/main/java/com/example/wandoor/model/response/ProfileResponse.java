@@ -11,11 +11,11 @@ public record ProfileResponse (
         String id,
         String cif,
         String username,
-        String first_name,
-        String middle_name,
-        String lastname,
+        String firstName,
+        String middleName,
+        String lastName,
         LocalDateTime dob,
-        Number phone_number,
-        String email_address
+        Number phoneNumber,
+        String emailAddress
     ){}
 }
