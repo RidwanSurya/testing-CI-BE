@@ -2,9 +2,9 @@ name: CI/CD for Spring Boot Docker App
 
 on:
   push:
-    branches: ["ci/adam/setup-github-action"]
+    branches: "main"
   pull_request:
-    branches: ["ci/adam/setup-github-action"]
+    branches: "main"
 
 jobs:
   build:
