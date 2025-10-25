@@ -3,10 +3,9 @@ package com.example.wandoor.service;
 import com.example.wandoor.config.RequestContext;
 import com.example.wandoor.model.entity.Account;
 import com.example.wandoor.model.entity.LifegoalsAccount;
-import com.example.wandoor.model.entity.SplitBill;
 import com.example.wandoor.model.entity.TimeDepositAccount;
 import com.example.wandoor.model.enums.AccountStatus;
-import com.example.wandoor.model.enums.TrxType;
+import com.example.wandoor.model.enums.DebitCredit;
 import com.example.wandoor.model.response.FetchDashboardResponse;
 import com.example.wandoor.repository.*;
 import lombok.AllArgsConstructor;
@@ -18,8 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
-
-import static java.lang.Long.sum;
 
 @Service
 @Log4j2
@@ -65,8 +62,8 @@ public class DashboardService {
         var remainingBillAmount = nvl(splitBillMemberRepository.sumRemainingForCreator(userId, cif));
 
         // CASH FLOW OVERVIEW
-        var totalIncome = nvl(trxHistoryRepository.sumTrxAmountByUserIdAndCifAndTrxType(userId, TrxType.CREDIT));
-        var totalExpenses = nvl(trxHistoryRepository.sumTrxAmountByUserIdAndCifAndTrxType(userId, TrxType.DEBIT));
+        var totalIncome = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndCifAndDebitCredit(userId, DebitCredit.DEBIT));
+        var totalExpenses = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndCifAndDebitCredit(userId, DebitCredit.CREDIT));
 
         // Portfolio Overview
         var portfolioOverview = List.of(

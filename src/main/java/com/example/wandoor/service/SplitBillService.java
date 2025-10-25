@@ -5,27 +5,33 @@ import com.example.wandoor.model.entity.SplitBill;
 import com.example.wandoor.model.entity.SplitBillMember;
 import com.example.wandoor.model.request.SplitBillDetailRequest;
 import com.example.wandoor.model.response.SplitBillDetailResponse;
+import com.example.wandoor.model.request.AddNewSplitBillRequest;
 import com.example.wandoor.model.response.SplitBillsListResponse;
-import com.example.wandoor.repository.ProfileRepository;
-import com.example.wandoor.repository.SplitBillMemberRepository;
-import com.example.wandoor.repository.SplitBillRepository;
+import com.example.wandoor.repository.*;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@RequiredArgsConstructor
 @Log4j2
 public class SplitBillService {
     private final SplitBillRepository splitBillRepository;
     private final SplitBillMemberRepository splitBillMemberRepository;
     private final ProfileRepository profileRepository;
+    private final TrxHistoryRepository trxHistoryRepository;
+    private final AccountRepository accountRepository;
 
     public SplitBillsListResponse getAllSplitBill(){
         var userId = RequestContext.get().getUserId();
@@ -143,4 +149,67 @@ public class SplitBillService {
         );
     }
 
+
+    public String createSplitBill(AddNewSplitBillRequest request) {
+        var userId = RequestContext.get().getUserId();
+        var cif = RequestContext.get().getCif();
+
+        var userData = profileRepository.findByIdAndCif(userId, cif)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User not found"));
+
+        var account = accountRepository.findByUserIdAndCifAndAccountNumber(userId, cif, request.accountNumber())
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.CONFLICT, "No Such Account"));
+
+
+        var trx = trxHistoryRepository
+                .findByIdAndAccountNumber(request.transactionId(), account.getAccountNumber())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Invalid Transaction Id"));
+
+        BigDecimal totalMemberAmount = request.billMembers().stream()
+                .map(AddNewSplitBillRequest.BillMembers::amountShare)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (trx.getTransactionAmount().compareTo(totalMemberAmount) != 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Invalid Total Amount");
+        }
+
+        //insert ke table split bill
+        SplitBill splitBill = SplitBill.builder()
+                .id(UUID.randomUUID().toString())
+                .userId(userId)
+                .cif(cif)
+                .accountNumber(account.getAccountNumber())
+                .transactionId(trx.getId())
+                .splitBillTitle(request.splitBillTitle())
+                .currency(request.currency())
+                .totalAmount(trx.getTransactionAmount())
+                .isDeleted(0)
+                .createdBy("SYSTEM")
+                .updatedBy("SYSTEM")
+                .updatedTime(LocalDateTime.now())
+                .build();
+
+        List<SplitBillMember> members = request.billMembers().stream()
+                .map(m -> SplitBillMember.builder()
+                        .id(UUID.randomUUID().toString())
+                        .splitBill(SplitBill.builder().id(splitBill.getId()).build())
+                        .userId(userData.getId())
+                        .memberName(m.memberName())
+                        .amountShare(m.amountShare())
+                        .hasPaid(0)
+                        .isDeleted(0)
+                        .createdBy("SYSTEM")
+                        .createdTime(LocalDateTime.now())
+                        .updatedBy("SYSTEM")
+                        .updatedTime(LocalDateTime.now())
+                        .build())
+                .toList();
+
+        splitBillMemberRepository.saveAll(members);
+
+        log.info("Split bill created successfully with ID={}", splitBill.getId());
+
+        return splitBill.getId();
+    }
 }

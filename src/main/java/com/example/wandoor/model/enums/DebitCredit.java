@@ -1,7 +1,6 @@
 package com.example.wandoor.model.enums;
 
-public enum TrxType {
+public enum DebitCredit {
     CREDIT,
     DEBIT
-
 }
