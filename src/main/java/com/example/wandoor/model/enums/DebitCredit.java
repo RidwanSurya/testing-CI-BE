@@ -1,6 +1,6 @@
 package com.example.wandoor.model.enums;
 
 public enum DebitCredit {
-    CREDIT,
-    DEBIT
+    C,
+    D
 }

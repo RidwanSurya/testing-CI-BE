@@ -69,7 +69,7 @@ public class LifegoalsService {
                         a.getAccountNumber(),
                         a.getLifegoalsName(),
                         a.getLifegoalsCategoryName(),
-                        nz(a.getAccountTarget()),
+                        nz(a.getAccountTargetAmount()),
                         nz(a.getEstimationAmount()),
                         created
                 );
@@ -108,7 +108,7 @@ public class LifegoalsService {
 
         return new LifegoalsDetailsResponse(
                 getData.getAccountNumber(),
-                nz(getData.getAccountTarget()),
+                nz(getData.getAccountTargetAmount()),
                 nz(getData.getAccountDeposit()),
                 interestRate,
                 maturityStr,

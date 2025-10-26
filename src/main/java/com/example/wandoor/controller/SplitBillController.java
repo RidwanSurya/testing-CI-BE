@@ -38,7 +38,8 @@ public class SplitBillController {
     @PostMapping("/detail")
     public ResponseEntity<SplitBillDetailResponse> getAllSplitBillMember(@Valid @RequestBody SplitBillDetailRequest request){
         SplitBillDetailResponse response = splitBillService.getAllSplitBillMember(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response); }
+
     @PostMapping("/add")
     public ResponseEntity<Map<String, String>> createSplitBill(
             @Valid @RequestBody AddNewSplitBillRequest request){

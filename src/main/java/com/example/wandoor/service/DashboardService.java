@@ -2,10 +2,12 @@ package com.example.wandoor.service;
 
 import com.example.wandoor.config.RequestContext;
 import com.example.wandoor.model.entity.Account;
+import com.example.wandoor.model.entity.DplkAccount;
 import com.example.wandoor.model.entity.LifegoalsAccount;
 import com.example.wandoor.model.entity.TimeDepositAccount;
 import com.example.wandoor.model.enums.AccountStatus;
 import com.example.wandoor.model.enums.DebitCredit;
+import com.example.wandoor.model.response.DplkListResponse;
 import com.example.wandoor.model.response.FetchDashboardResponse;
 import com.example.wandoor.repository.*;
 import lombok.AllArgsConstructor;
@@ -30,6 +32,7 @@ public class DashboardService {
     private final SplitBillRepository splitBillRepository;
     private final TrxHistoryRepository trxHistoryRepository;
     private final SplitBillMemberRepository splitBillMemberRepository;
+    private final DplkAccountRepository dplkAccountRepository;
 
     @Transactional
     public FetchDashboardResponse fetchDashboard() {
@@ -44,17 +47,17 @@ public class DashboardService {
         var timeDeposit = timeDepositRepository.findByUserIdAndCif(userId,  cif);
         var account = accountRepository.findByUserIdAndCif(userId, cif);
         var lifegoals = lifegoalsAccountRepository.findByUserIdAndCif(userId, cif);
-        // add pensiun
+        var dplk = dplkAccountRepository.findAllByUserIdAndCif(userId, cif);
+
         var statuses = List.of(AccountStatus.BUKA, AccountStatus.BARU);
         List<Account> accounts = accountRepository.fetchActiveAccounts(userId, cif, statuses);
 
         var totalTimeDeposit = sum(timeDeposit, TimeDepositAccount::getEffectiveBalance);
         var totalAccount = sum(account, Account::getEffectiveBalance);
         var totalLifegoals = sum(lifegoals, LifegoalsAccount::getEstimationAmount);
-        // total pensiun
+//        var totalDplk = sum(dplk, DplkAccount::ge);
 
-        var totalAsset = totalAccount.add(totalTimeDeposit).add(totalLifegoals);
-        // add total pensiun
+        var totalAsset = totalAccount.add(totalTimeDeposit).add(totalLifegoals); // add dplk
 
         // Split bill overview
         var countSplitBills = splitBillRepository.countActiveByCreator(userId, cif);
@@ -62,15 +65,15 @@ public class DashboardService {
         var remainingBillAmount = nvl(splitBillMemberRepository.sumRemainingForCreator(userId, cif));
 
         // CASH FLOW OVERVIEW
-        var totalIncome = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndCifAndDebitCredit(userId, DebitCredit.DEBIT));
-        var totalExpenses = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndCifAndDebitCredit(userId, DebitCredit.CREDIT));
+        var totalIncome = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndCifAndDebitCredit(userId, DebitCredit.D));
+        var totalExpenses = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndCifAndDebitCredit(userId, DebitCredit.C));
 
         // Portfolio Overview
         var portfolioOverview = List.of(
                 new FetchDashboardResponse.PortfolioOverview("timeDeposit", totalTimeDeposit),
                 new FetchDashboardResponse.PortfolioOverview("lifegoals", totalLifegoals),
                 new FetchDashboardResponse.PortfolioOverview("accountSavings", totalAccount)
-                // kurang dplk
+//                new FetchDashboardResponse.PortfolioOverview("pensiunFunds", totalDplk)
         );
 
         // AccountList
