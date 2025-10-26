@@ -7,23 +7,22 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record AddNewSplitBillRequest(
+public record EditSplitBillRequest (
         @NotBlank
-        String accountNumber,
+        String splitBillId,
         @NotBlank
         String transactionId,
         @NotBlank
         String splitBillTitle,
         @NotBlank
-        String currency,
-        @NotNull
         BigDecimal totalAmount,
         @NotEmpty
         @NotNull
         List<BillMembers> billMembers
 ) {
-    public record BillMembers(
+    public record BillMembers (
         @NotBlank String memberName,
-        @NotNull BigDecimal amountShare
+        @NotNull BigDecimal amountShare,
+        @NotNull Boolean hasPaid
     ){}
 }
