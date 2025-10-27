@@ -1,13 +1,11 @@
-çspring:
+spring:
   application:
     name: wandoor
 
   datasource:
     url: "jdbc:oracle:thin:@localhost:1521/WANDOOR_DB"
-#    username: ${DB_USERNAME:WANDOOR}
-#    password: ${DB_PASSWORD:root}
-    username: WANDOOR
-    password: root
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: oracle.jdbc.OracleDriver
 
   jpa:
@@ -24,7 +22,6 @@
     schemas: WANDOOR
     create-schemas: false
     locations: classpath:db/migration
-#    clean-disabled: false
 
   mail:
     host: smtp.gmail.com
@@ -40,13 +37,15 @@
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
 logging:
   level:
     org.springframework.security: DEBUG
-    org.springframework.data.redis: INFO
+    org.springframework.data.redis.core.RedisTemplate: DEBUG
+    io.lettuce.core.protocol: DEBUG
 
 # secret & expiry JWT
 app:

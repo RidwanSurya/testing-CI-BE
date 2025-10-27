@@ -39,4 +39,16 @@ public class JwtUtils {
     public String getRole(String token){
         return validateToken(token).getClaim("role").asString();
     }
+
+    public long getRemainingValidity(String token) {
+        Date expiration = extractExpiration(token);
+        return (expiration.getTime() - System.currentTimeMillis()) / 1000;
+    }
+
+    public Date extractExpiration(String token) {
+        return validateToken(token).getExpiresAt();
+    }
+
+
 }
+
