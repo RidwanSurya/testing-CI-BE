@@ -49,6 +49,7 @@ public class SplitBill {
 //    @Column(nullable = false)
 //    private LocalDateTime paymentTime;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer isDeleted = 0;
 

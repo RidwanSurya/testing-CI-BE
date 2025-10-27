@@ -5,7 +5,7 @@ public record SplitBillDetailRequest(
     @NotBlank
     String splitBillId,
 
-    @NotBlank
+
     String transactionId
     ) {
 }

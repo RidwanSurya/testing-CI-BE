@@ -36,6 +36,7 @@ public class SplitBillMember {
     @Column(nullable = false)
     private BigDecimal amountShare;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer hasPaid = 0;
 
@@ -44,6 +45,7 @@ public class SplitBillMember {
     @Column(nullable = false)
     private String memberName;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer isDeleted = 0;
 

@@ -21,7 +21,8 @@ public record SplitBillDetailResponse (
             String memberName,
             BigDecimal amount,
             String status,
-            String paymentTime
+            String paymentTime,
+            Boolean hasPaid
         ) {
         }
     }
