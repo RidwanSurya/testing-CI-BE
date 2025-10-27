@@ -1,9 +1,8 @@
 package com.example.wandoor.controller;
 
+import com.example.wandoor.model.request.EditSplitBillRequest;
 import com.example.wandoor.model.request.SplitBillDetailRequest;
-import com.example.wandoor.model.response.AddNewSplitBillResponse;
-import com.example.wandoor.model.response.SplitBillDetailResponse;
-import com.example.wandoor.model.response.SplitBillsListResponse;
+import com.example.wandoor.model.response.*;
 import com.example.wandoor.service.SplitBillService;
 
 import com.example.wandoor.model.request.AddNewSplitBillRequest;
@@ -48,15 +47,20 @@ public class SplitBillController {
             @Valid @RequestBody AddNewSplitBillRequest request){
 
         log.info("Receive create split bill request: {}", request.splitBillTitle());
-        String splitBillId = splitBillService.createSplitBill(request);
-
-        AddNewSplitBillResponse response = new AddNewSplitBillResponse(
-                "Split bill created successfully",
-                splitBillId
-        );
+        AddNewSplitBillResponse response = splitBillService.createSplitBill(request);
 
         return ResponseEntity
-                .created(URI.create("api/split-bill" + splitBillId))
+                .created(URI.create("api/split-bill" + response.splitBillId()))
                 .body(response);
+    }
+
+    @PutMapping("/edit")
+    public ResponseEntity<EditSplitBillResponse> editSplitBill(
+            @Valid @RequestBody EditSplitBillRequest request){
+
+        log.info("Receive create split bill request: {}", request.splitBillTitle());
+
+        EditSplitBillResponse response = splitBillService.editSplitBill(request);
+        return ResponseEntity.ok(response);
     }
 }

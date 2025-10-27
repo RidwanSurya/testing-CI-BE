@@ -17,6 +17,7 @@ public record SplitBillDetailResponse (
         List<Member> members
     ) {
         public record Member(
+            String memberId,
             String memberName,
             BigDecimal amount,
             String status,

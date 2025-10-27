@@ -24,4 +24,5 @@ public interface TrxHistoryRepository extends JpaRepository<TrxHistory, String> 
 
 
     Optional<TrxHistory> findByIdAndAccountNumber(String id, String accountNumber);
+    Optional<TrxHistory> findTrxHistoryById(String transactionId);
 }

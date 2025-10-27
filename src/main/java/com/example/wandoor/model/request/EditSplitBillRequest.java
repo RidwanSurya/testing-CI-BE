@@ -21,6 +21,7 @@ public record EditSplitBillRequest (
         List<BillMembers> billMembers
 ) {
     public record BillMembers (
+        @NotBlank String memberId,
         @NotBlank String memberName,
         @NotNull BigDecimal amountShare,
         @NotNull Boolean hasPaid
