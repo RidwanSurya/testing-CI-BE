@@ -26,9 +26,20 @@ services:
       retries: 10
       start_period: 30s
 
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--requirepass", "rediswandoor"]
+    volumes:
+      - redis-data:/data
+    restart: always
+
 networks:
   wandoor-network:
     driver: bridge
 
 volumes:
   oracle-data:
+  redis-data:

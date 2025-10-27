@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +23,8 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     private final RequestContext requestContext;
+    private final StringRedisTemplate stringRedisTemplate;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest req,
@@ -53,6 +56,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         var token = header.substring(7);
         try {
+            var blacklistKey = "jwt_blacklist:" + token;
+            if (stringRedisTemplate.hasKey(blacklistKey)) {
+                unauthorized(response, "Unauthorized - Token sudah logout");
+                return;
+            }
+
             var jwt = jwtUtils.validateToken(token);
             var userId = jwt.getSubject();
             var role = jwt.getClaim("role").asString();
