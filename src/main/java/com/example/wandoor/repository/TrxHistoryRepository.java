@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 public interface TrxHistoryRepository extends JpaRepository<TrxHistory, String> {
@@ -24,4 +25,19 @@ public interface TrxHistoryRepository extends JpaRepository<TrxHistory, String> 
 
 
     Optional<TrxHistory> findByIdAndAccountNumber(String id, String accountNumber);
+
+    @Query("""
+            SELECT t FROM TrxHistory t
+            WHERE t.userId = :userId
+            AND t.accountNumber = :accountNumber
+            AND EXTRACT(MONTH FROM t.transactionDate) = :month
+            AND EXTRACT(YEAR FROM t.transactionDate) = :year
+            ORDER BY t.transactionDate DESC
+            """)
+    List<TrxHistory> findByUserIdAndAccountNumberAndMonthYear(
+            @Param("userId") String userId,
+            @Param("accountNumber") String accountNumber,
+            @Param("month") int month,
+            @Param("year") int year
+    );
 }

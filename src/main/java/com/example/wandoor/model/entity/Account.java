@@ -1,6 +1,7 @@
 package com.example.wandoor.model.entity;
 
 import com.example.wandoor.model.enums.AccountStatus;
+import com.example.wandoor.model.enums.ProductType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -35,8 +36,9 @@ public class Account {
     @Column(nullable = false)
     private BigDecimal effectiveBalance;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String accountType;
+    private ProductType accountType;
 
     @Column(nullable = false)
     private String subCat;

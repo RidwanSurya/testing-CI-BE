@@ -42,9 +42,6 @@ public class LifegoalsAccount {
     private BigDecimal accountDeposit;
 
     @Column(nullable = false)
-    private BigDecimal accountTarget;
-
-    @Column(nullable = false)
     private String lifegoalsTrxCreationId;
 
     @Column(nullable = false)

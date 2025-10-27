@@ -1,11 +1,13 @@
-spring:
+çspring:
   application:
     name: wandoor
 
   datasource:
     url: "jdbc:oracle:thin:@localhost:1521/WANDOOR_DB"
-    username: ${DB_USERNAME:WANDOOR}
-    password: ${DB_PASSWORD:root}
+#    username: ${DB_USERNAME:WANDOOR}
+#    password: ${DB_PASSWORD:root}
+    username: WANDOOR
+    password: root
     driver-class-name: oracle.jdbc.OracleDriver
 
   jpa:
@@ -22,6 +24,7 @@ spring:
     schemas: WANDOOR
     create-schemas: false
     locations: classpath:db/migration
+#    clean-disabled: false
 
   mail:
     host: smtp.gmail.com

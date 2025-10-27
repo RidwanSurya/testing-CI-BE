@@ -192,7 +192,6 @@ public class SplitBillService {
 
         List<SplitBillMember> members = request.billMembers().stream()
                 .map(m -> SplitBillMember.builder()
-                        .id(UUID.randomUUID().toString())
                         .splitBill(SplitBill.builder().id(splitBill.getId()).build())
                         .userId(userData.getId())
                         .memberName(m.memberName())
