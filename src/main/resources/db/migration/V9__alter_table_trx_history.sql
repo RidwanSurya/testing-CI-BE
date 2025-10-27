@@ -15,5 +15,10 @@ ALTER TABLE TRX_HISTORY ADD (
     party_name          VARCHAR2(55) NOT NULL,
     party_detail        VARCHAR2(55) NOT NULL,
     payment_method      VARCHAR2(55),
-    debit_credit        VARCHAR2(20) NOT NULL
+    debit_credit        VARCHAR2(20) NOT NULL,
+    split_bill_id       VARCHAR2(21)
 )
+
+ALTER TABLE TRX_HISTORY
+ADD CONSTRAINT FK_TRX_HISTORY_SPLIT_BILL
+FOREIGN KEY (split_bill_id) REFERENCES SPLIT_BILL(id)
