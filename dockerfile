@@ -5,8 +5,8 @@ WORKDIR /app
 # Salin semua file proyek ke container builder
 COPY . .
 
-# Build tanpa menjalankan test
-RUN gradle clean build -x test
+# Build menjalankan test
+RUN gradle clean build
 
 ## Stage 2: Jalankan aplikasi dengan image OpenJDK ringan
 FROM openjdk:17-jdk-slim

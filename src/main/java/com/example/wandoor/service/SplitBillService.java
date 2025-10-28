@@ -23,11 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-<<<<<<< HEAD
-// @AllArgsConstructor
-=======
 //@AllArgsConstructor
->>>>>>> f1ee4ef6ffb40bae70d7b4a863caa5bc2a436f48
 @RequiredArgsConstructor
 @Log4j2
 public class SplitBillService {
