@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 
 # Build tanpa menjalankan test
-RUN gradle clean build -x test
+RUN gradle clean build
 
 ## Stage 2: Jalankan aplikasi dengan image OpenJDK ringan
 FROM openjdk:17-jdk-slim
@@ -16,7 +16,7 @@ WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 
 # Expose port aplikasi Spring Boot (default: 8080)
-EXPOSE 8081
+EXPOSE 8080
 
 # Environment variable untuk koneksi ke Oracle
 ENV SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle-db-app:1521/wandoor_db \
