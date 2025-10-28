@@ -52,7 +52,7 @@ jobs:
       # Set environment variable agar Spring Boot connect ke Oracle container
       - name: Set environment variables
         run: |
-          echo "SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//localhost:1521/XEPDB1" >> $GITHUB_ENV
+          echo "SPRING_DATASOURCE_URL=${{secrets.SPRING_DATASOURCE_URL}}" >> $GITHUB_ENV
           echo "SPRING_DATASOURCE_USERNAME=${{secrets.SPRING_DATASOURCE_USERNAME}}" >> $GITHUB_ENV
           echo "SPRING_DATASOURCE_PASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}}" >> $GITHUB_ENV
 
