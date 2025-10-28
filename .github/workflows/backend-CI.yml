@@ -2,9 +2,9 @@ name: CI/CD for Spring Boot Docker App
 
 on:
   push:
-    branches: ["ci/adam/setup-github-action"] # Ganti dengan nama branch yang Anda gunakan untuk production, misalnya 'main' atau 'master'
+    branches: ["staging"] # Ganti dengan nama branch yang Anda gunakan untuk production, misalnya 'main' atau 'master'
   pull_request:
-    branches: ["ci/adam/setup-github-action"]
+    branches: ["staging"]
 
 jobs:
   build:
@@ -58,7 +58,7 @@ jobs:
 
       # Build dengan Gradle (bisa tambahkan test jika ingin uji koneksi DB)
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean build
 
       # Log in to DockerHub
       - name: Log in to DockerHub
