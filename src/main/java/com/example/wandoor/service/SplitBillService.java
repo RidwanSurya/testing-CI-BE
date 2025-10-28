@@ -114,7 +114,7 @@ public class SplitBillService {
         // Buat list member response
         List<SplitBillDetailResponse.Data.Member> memberList = new ArrayList<>();
         for (SplitBillMember m : members) {
-            BigDecimal hasPaid = BigDecimal.valueOf(m.getHasPaid());
+            Boolean hasPaid = m.getHasPaid() != null && m.getHasPaid() == 1;
             BigDecimal amountShare = m.getAmountShare();
 
             // Jika hasPaid >= amountShare → Paid, else Unpaid
@@ -130,9 +130,11 @@ public class SplitBillService {
                     m.getMemberName(),
                     amountShare,
                     status,
-                    paymentDate
+                    paymentDate,
+                    hasPaid
             ));
         }
+
 
         // Ambil data utama dari transaksi split bill
         var splitBill = transaction.get();
@@ -230,7 +232,7 @@ public class SplitBillService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User Not Found"));
 
         // validate Split Bill Data
-        var trxHistoryData = trxHistoryRepository.findTrxHistoryById(request.transactionId())
+        var trxHistoryData = trxHistoryRepository.findByTrxId(request.transactionId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Invalid Transaction Id"));
 
         var splitBillData = splitBillRepository.findBySplitBillIdAndUserIdAndCifAndTransactionId(request.splitBillId(), userData.getId(), userData.getCif(), trxHistoryData.getId())

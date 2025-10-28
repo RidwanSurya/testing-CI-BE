@@ -68,7 +68,7 @@ public class AccountService {
         TargetAccountDetail targetAccountDetail = new TargetAccountDetail(
                 selectedAccount.getAccountNumber(),
                 selectedAccount.getAccountHolderName(),
-                selectedAccount.getAccountType(),
+                selectedAccount.getProductName(),
                 selectedAccount.getEffectiveBalance(),
                 selectedAccount.getIsMainAccount() == 1,
                 selectedAccount.getAccountStatus().toString()
