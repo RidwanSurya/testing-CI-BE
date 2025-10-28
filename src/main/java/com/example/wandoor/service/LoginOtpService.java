@@ -45,7 +45,7 @@ public class LoginOtpService{
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final BlockUserNow blockUserNow;
 
-    private static final Duration OTP_TTL = Duration.ofMinutes(3);
+    private static final Duration OTP_TTL = Duration.ofMinutes(5);
     private static final Duration ISSUE_WINDOW = Duration.ofMinutes(10);
     private static final int ISSUE_LIMIT = 3;
     private static final Duration TOKEN_TTL = Duration.ofHours(2);
@@ -62,7 +62,7 @@ public class LoginOtpService{
 
         var checkPassword = passwordEncoder.matches(req.password(), userAuth.getPassword());
         if (!checkPassword) {
-            var failKey = "login_failed:" + req.username();
+            var failKey = "failed_attemps" + req.username();
             Long failCount = stringRedisTemplate.opsForValue().increment(failKey);
             if(failCount == 1) stringRedisTemplate.expire(failKey, Duration.ofHours(1));
             if (failCount >= 3) {
@@ -82,28 +82,32 @@ public class LoginOtpService{
                 ? userAuth.getEmailAddress()
                 : profile.getEmailAddress();
 
-        var rateKey = "otp_count:" + userAuth.getUserId();
-        Long count = stringRedisTemplate.opsForValue().increment(rateKey);
-        if (count == 1 ) stringRedisTemplate.expire(rateKey, ISSUE_WINDOW);
-        if (count > ISSUE_LIMIT)
-            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Terlalu banyak permintaan OTP. Silahkan coba lagi beberapa menit");
+//        var rateKey = "otp_count:" + userAuth.getUserId();
+//        Long count = stringRedisTemplate.opsForValue().increment(rateKey);
+//        if (count == 1 ) stringRedisTemplate.expire(rateKey, ISSUE_WINDOW);
+//        if (count > ISSUE_LIMIT)
+//            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Terlalu banyak permintaan OTP. Silahkan coba lagi beberapa menit");
 
         // generate OTP
         var otp = String.format("%06d", new Random().nextInt(999999));
+        var sessionId = UUID.randomUUID().toString();
         var otpKey = "otp:" + userAuth.getUserId();
 
         Map<String, String> otpData = Map.of(
-                "otp", otp,
-                "email", userAuth.getEmailAddress(),
-                "userId", userAuth.getUserId()
+                "userId", userAuth.getUserId(),
+                "sessionId", sessionId
+//                "email", userAuth.getEmailAddress(),
+//                "otp", otp,
+//                "otpCreatedAt", LocalDateTime.now(),
+//                "otpExpiresAt", OTP_TTL.toMinutes()
         );
 
         stringRedisTemplate.opsForHash().putAll(otpKey, otpData);
         stringRedisTemplate.expire(otpKey, OTP_TTL);
 
         log.info("🧩 Menyimpan OTP ke Redis key={} ttl={}menit", otpKey, OTP_TTL.toMinutes());
-        redisTemplate.opsForHash().putAll(otpKey, otpData);
-        redisTemplate.expire(otpKey, OTP_TTL);
+        stringRedisTemplate.opsForHash().putAll(otpKey, otpData);
+        stringRedisTemplate.expire(otpKey, OTP_TTL);
         log.info("✅ Key {} berhasil disimpan di Redis: {}", otpKey, redisTemplate.hasKey(otpKey));
 
 
@@ -116,15 +120,15 @@ public class LoginOtpService{
     @Transactional
     public VerifyOtpResponse verifyOtp(VerifyOtpRequest req) {
         var otpKey = "otp:" + req.user_id();
-        Map<Object, Object> otpData = redisTemplate.opsForHash().entries(otpKey);
+        Map<Object, Object> otpData = stringRedisTemplate.opsForHash().entries(otpKey);
 
         if(otpData.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP exipired atau tidak ditemukan");
 
         var storedOtp = (String) otpData.get("otp");
         if (!req.otp_code().equals(storedOtp)) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "OTP SALAH");
 
-        redisTemplate.delete(otpKey);
-        redisTemplate.delete("otp_count:" + req.user_id());
+        stringRedisTemplate.delete(otpKey);
+        stringRedisTemplate.delete("otp_count:" + req.user_id());
 
         var role = roleManagementRepository.findFirstByUserId(req.user_id())
                 .map(RoleManagement::getRoleName)
