@@ -6,7 +6,6 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -50,6 +49,7 @@ public class SplitBill {
 //    @Column(nullable = false)
 //    private LocalDateTime paymentTime;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer isDeleted = 0;
 

@@ -1,10 +1,8 @@
 package com.example.wandoor.controller;
-import java.util.Map;
 
 import com.example.wandoor.model.response.ProfileResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

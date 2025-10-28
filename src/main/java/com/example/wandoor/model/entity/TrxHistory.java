@@ -30,22 +30,34 @@ public class TrxHistory {
     private String accountNumber;
 
     @Column(nullable = false)
-    private LocalDateTime trxDate;
-
-    @Column(nullable = false)
-    private String trxCatId;
+    private LocalDateTime transactionDate;
 
     @Column(nullable = false)
     private BigDecimal transactionAmount;
 
     @Column(nullable = false)
-    private String trxTarget;
+    private String transactionType;
 
     @Column(nullable = false)
-    private String trxNote;
+    private String transactionDescription;
+
+    @Column(nullable = false)
+    private String partyName;
+
+    @Column(nullable = false)
+    private String partyDetail;
+
+    private String paymentMethod;
 
     @Column(nullable = false)
     private DebitCredit debitCredit;
+
+    @Column(nullable = false)
+    private String splitBillId;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Integer hasSplitted = 0;
 
     @Column(nullable = false)
     private String createdBy;

@@ -3,6 +3,8 @@ package com.example.wandoor.service;
 import com.example.wandoor.config.RequestContext;
 import com.example.wandoor.model.entity.SplitBill;
 import com.example.wandoor.model.entity.SplitBillMember;
+import com.example.wandoor.model.request.SplitBillDetailRequest;
+import com.example.wandoor.model.response.SplitBillDetailResponse;
 import com.example.wandoor.model.request.AddNewSplitBillRequest;
 import com.example.wandoor.model.response.SplitBillsListResponse;
 import com.example.wandoor.repository.*;
@@ -21,7 +23,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+<<<<<<< HEAD
 // @AllArgsConstructor
+=======
+//@AllArgsConstructor
+>>>>>>> f1ee4ef6ffb40bae70d7b4a863caa5bc2a436f48
 @RequiredArgsConstructor
 @Log4j2
 public class SplitBillService {
@@ -90,6 +96,63 @@ public class SplitBillService {
 
         return new SplitBillsListResponse(responseList);
     }
+    public SplitBillDetailResponse getAllSplitBillMember(SplitBillDetailRequest request) {
+        var userId = RequestContext.get().getUserId();
+        var cif = RequestContext.get().getCif();
+
+        var transaction = splitBillRepository.findByTransactionId(request.transactionId());
+        if (transaction.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
+        }
+
+        var members = splitBillMemberRepository.findAllBySplitBillId(request.splitBillId());
+        if (members.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
+        }
+
+        // Buat list member response
+        List<SplitBillDetailResponse.Data.Member> memberList = new ArrayList<>();
+        for (SplitBillMember m : members) {
+            BigDecimal hasPaid = BigDecimal.valueOf(m.getHasPaid());
+            BigDecimal amountShare = m.getAmountShare();
+
+            // Jika hasPaid >= amountShare → Paid, else Unpaid
+            String status = (hasPaid.compareTo(amountShare) >= 0) ? "Paid" : "Unpaid";
+
+            // Konversi tanggal ke String agar cocok dengan record
+            String paymentDate = (m.getPaymentDate() != null)
+                    ? m.getPaymentDate().toString()
+                    : "-";
+
+            memberList.add(new SplitBillDetailResponse.Data.Member(
+                    m.getMemberName(),
+                    amountShare,
+                    status,
+                    paymentDate
+            ));
+        }
+
+        // Ambil data utama dari transaksi split bill
+        var splitBill = transaction.get();
+
+        SplitBillDetailResponse.Data data = new SplitBillDetailResponse.Data(
+                splitBill.getId(),
+                splitBill.getSplitBillTitle(),
+                splitBill.getCurrency(),
+                splitBill.getTotalAmount(),
+                splitBill.getCreatedTime().toString(),
+                splitBill.getTransactionId(),
+                memberList
+        );
+
+        // Return response akhir
+        return new SplitBillDetailResponse(
+                "success",
+                "Split Bill Detail Fetched Successfully",
+                data
+        );
+    }
+
 
     public String createSplitBill(AddNewSplitBillRequest request) {
         var userId = RequestContext.get().getUserId();
@@ -133,7 +196,6 @@ public class SplitBillService {
 
         List<SplitBillMember> members = request.billMembers().stream()
                 .map(m -> SplitBillMember.builder()
-                        .id(UUID.randomUUID().toString())
                         .splitBill(SplitBill.builder().id(splitBill.getId()).build())
                         .userId(userData.getId())
                         .memberName(m.memberName())
