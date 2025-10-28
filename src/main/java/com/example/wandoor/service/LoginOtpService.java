@@ -6,9 +6,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import com.example.wandoor.model.request.ResendOtpRequest;
 import com.example.wandoor.model.response.LogoutResponse;
+import com.example.wandoor.model.response.ResendOtpResponse;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +36,7 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class LoginOtpService{
+public class LoginOtpService {
     private final UserAuthRepository userAuthRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(5);
     private final UserOtpVerificationRepository userOtpVerificationRepository;
@@ -45,14 +49,19 @@ public class LoginOtpService{
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final BlockUserNow blockUserNow;
 
-    private static final Duration OTP_TTL = Duration.ofMinutes(5);
+    private static final Duration OTP_TTL = Duration.ofMinutes(3);
+    private static final Duration COOLDOWN_TTL = Duration.ofSeconds(120);
+    private static final Duration BLOCK_TTL = Duration.ofMinutes(10);
+    private static final Duration LOGIN_FAIL_TTL = Duration.ofHours(1);
     private static final Duration ISSUE_WINDOW = Duration.ofMinutes(10);
     private static final int ISSUE_LIMIT = 3;
     private static final Duration TOKEN_TTL = Duration.ofHours(2);
 
+    private static final int MAX_LOGIN_FAIL = 3;
+    private static final int MAX_OTP_FAIL = 3;
 
     @Transactional
-    public LoginResponse login (LoginRequest req){
+    public LoginResponse login(LoginRequest req) {
         var userAuth = userAuthRepository.findByUsername(req.username())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username atau Password salah"));
 
@@ -60,21 +69,38 @@ public class LoginOtpService{
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Akun diblokir, hubungi CS untuk membuka blokir.");
         }
 
+        var temporaryBlockAccount = "otp:blocked:user:" + req.username();
+        if (stringRedisTemplate.hasKey(temporaryBlockAccount)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "akun diblokir sementara, tunggu beberapa saat");
+        }
+
         var checkPassword = passwordEncoder.matches(req.password(), userAuth.getPassword());
         if (!checkPassword) {
-            var failKey = "failed_attemps" + req.username();
+            var failKey = "otp:login:failed:" + req.username();
             Long failCount = stringRedisTemplate.opsForValue().increment(failKey);
-            if(failCount == 1) stringRedisTemplate.expire(failKey, Duration.ofHours(1));
-            if (failCount >= 3) {
-//                userAuth.setIsUserBlocked(1);
-//                userAuthRepository.saveAndFlush(userAuth);
+            if (failCount == 1) stringRedisTemplate.expire(failKey, LOGIN_FAIL_TTL);
+            if (failCount >= MAX_LOGIN_FAIL) {
                 blockUserNow.blockUserNow(userAuth.getUserId());
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Akun diblokir karena 3 kali gagal login. Hubungi CS.");
             }
-            throw  new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username atau Password salah");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username atau Password salah");
         }
 
-        stringRedisTemplate.delete("login_failed:" + req.username());
+        stringRedisTemplate.delete("otp:login_failed:" + req.username());
+
+        var sessionId = UUID.randomUUID().toString();
+        var otp = String.format("%06d", new Random().nextInt(999999));
+
+        var otpSessionKey = "otp:session:" + sessionId;
+        Map<String, String> otpData = Map.of(
+                "userId", userAuth.getUserId(),
+                "username", userAuth.getUsername(),
+                "email", userAuth.getEmailAddress(),
+                "otp", otp
+        );
+        stringRedisTemplate.opsForHash().putAll(otpSessionKey, otpData);
+        stringRedisTemplate.expire(otpSessionKey, OTP_TTL);
+
 
         var profile = profileRepository.findById(userAuth.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Profile tidak ditemukan"));
@@ -82,66 +108,86 @@ public class LoginOtpService{
                 ? userAuth.getEmailAddress()
                 : profile.getEmailAddress();
 
+        // sent OTP by email
+        emailService.sendOtp(emailTo, otp);
+
+        log.info("OTP {} dikirim ke {} | session={} TTL={}m", otp, userAuth.getEmailAddress(), sessionId, OTP_TTL.toMinutes());
+
+        return new LoginResponse(true, "Kode OTP telah dikirim ke email Anda", sessionId);
+
 //        var rateKey = "otp_count:" + userAuth.getUserId();
 //        Long count = stringRedisTemplate.opsForValue().increment(rateKey);
 //        if (count == 1 ) stringRedisTemplate.expire(rateKey, ISSUE_WINDOW);
 //        if (count > ISSUE_LIMIT)
 //            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Terlalu banyak permintaan OTP. Silahkan coba lagi beberapa menit");
 
-        // generate OTP
-        var otp = String.format("%06d", new Random().nextInt(999999));
-        var sessionId = UUID.randomUUID().toString();
-        var otpKey = "otp:" + userAuth.getUserId();
+//        log.info("🧩 Menyimpan OTP ke Redis key={} ttl={}menit", otpKey, OTP_TTL.toMinutes());
+//        stringRedisTemplate.opsForHash().putAll(otpKey, otpData);
+//        stringRedisTemplate.expire(otpKey, OTP_TTL);
+//        log.info("✅ Key {} berhasil disimpan di Redis: {}", otpKey, redisTemplate.hasKey(otpKey));
 
-        Map<String, String> otpData = Map.of(
-                "userId", userAuth.getUserId(),
-                "sessionId", sessionId
-//                "email", userAuth.getEmailAddress(),
-//                "otp", otp,
-//                "otpCreatedAt", LocalDateTime.now(),
-//                "otpExpiresAt", OTP_TTL.toMinutes()
-        );
-
-        stringRedisTemplate.opsForHash().putAll(otpKey, otpData);
-        stringRedisTemplate.expire(otpKey, OTP_TTL);
-
-        log.info("🧩 Menyimpan OTP ke Redis key={} ttl={}menit", otpKey, OTP_TTL.toMinutes());
-        stringRedisTemplate.opsForHash().putAll(otpKey, otpData);
-        stringRedisTemplate.expire(otpKey, OTP_TTL);
-        log.info("✅ Key {} berhasil disimpan di Redis: {}", otpKey, redisTemplate.hasKey(otpKey));
-
-
-        // sent OTP by email
-        emailService.sendOtp(emailTo, otp);
-
-        return new LoginResponse(true, "Kode OTP telah dikirim ke email Anda", userAuth.getUserId());
     }
+    // sessionId
+    // failed
+    // block
 
     @Transactional
     public VerifyOtpResponse verifyOtp(VerifyOtpRequest req) {
-        var otpKey = "otp:" + req.user_id();
-        Map<Object, Object> otpData = stringRedisTemplate.opsForHash().entries(otpKey);
+        var otpSessionKey = "otp:session:" + req.sessionId();
+        Map<Object, Object> otpData = stringRedisTemplate.opsForHash().entries(otpSessionKey);
 
-        if(otpData.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP exipired atau tidak ditemukan");
+        if (otpData.isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP expired atau tidak ditemukan");
 
+        var username = (String) otpData.get("username");
         var storedOtp = (String) otpData.get("otp");
-        if (!req.otp_code().equals(storedOtp)) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "OTP SALAH");
+        var userId = (String) otpData.get("userId");
 
-        stringRedisTemplate.delete(otpKey);
-        stringRedisTemplate.delete("otp_count:" + req.user_id());
+        // counter attempt
+        var verifyAttemptKey = "otp:verify_attempt:" + req.sessionId();
+        Long attemptCount = stringRedisTemplate.opsForValue().increment(verifyAttemptKey);
+        if (attemptCount == 1) stringRedisTemplate.expire(verifyAttemptKey, OTP_TTL);
+        if (!req.otpCode().equals(storedOtp)) {
+            log.warn("OTP salah (attempt ke {}) untuk user {}", attemptCount, username);
 
-        var role = roleManagementRepository.findFirstByUserId(req.user_id())
+            if (attemptCount >= MAX_OTP_FAIL) {
+                stringRedisTemplate.opsForValue().set("otp:blocked:user:" + username, "true", BLOCK_TTL);
+                log.warn("User {} diblokir sementara selama {} menit", username, BLOCK_TTL.toMinutes());
+                return new VerifyOtpResponse(
+                        false,
+                        "Terlalu banyak percobaan OTP. Akun diblokir sementara.",
+                        null,
+                        null,
+                        attemptCount.intValue()
+                );
+            }
+
+            return new VerifyOtpResponse(
+                    false,
+                    "OTP salah. Percobaan ke-" + attemptCount + " dari " + MAX_OTP_FAIL + ".",
+                    null,
+                    null,
+                    attemptCount.intValue()
+            );
+        }
+
+        log.info("✅ OTP benar untuk user {} (attempt ke {})", username, attemptCount);
+
+        stringRedisTemplate.delete(otpSessionKey);
+        stringRedisTemplate.delete(verifyAttemptKey);
+//        stringRedisTemplate.delete("otp:cooldown:" + username);
+
+        var role = roleManagementRepository.findFirstByUserId(userId)
                 .map(RoleManagement::getRoleName)
                 .orElse("Nasabah");
-        var userData = userAuthRepository.findById(req.user_id())
+        var userData = userAuthRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found"));
 
-        var token = jwtUtils.generateToken(req.user_id(), role);
+        var token = jwtUtils.generateToken(userId, role);
 
-        var sessionKey = "session:" + req.user_id();
-        stringRedisTemplate.opsForValue().set(sessionKey, token);
+        var sessionKey = "session:" + req.sessionId();
+        stringRedisTemplate.opsForValue().set(sessionKey, token, TOKEN_TTL);
         stringRedisTemplate.expire(sessionKey, TOKEN_TTL);
-
 
         var dataUser = new VerifyOtpResponse.User(
                 userData.getUserId(),
@@ -149,11 +195,69 @@ public class LoginOtpService{
                 role
         );
 
-        return new VerifyOtpResponse(true, "login berhasil", token, dataUser);
+        return new VerifyOtpResponse(true, "login berhasil", token, dataUser, attemptCount.intValue());
     }
 
     @Transactional
-    public LogoutResponse logout(String token, String userId){
+    public ResendOtpResponse resendOtp(ResendOtpRequest req) {
+        var sessionKey = "otp:session:" + req.sessionId();
+        var sessionData = stringRedisTemplate.opsForHash().entries(sessionKey);
+
+        if (sessionData.isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Session tidak ditemukan atau OTP expired, silahkan login ulang");
+
+        var username = (String) sessionData.get("username");
+        var email = (String) sessionData.get("email");
+
+//        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey("otp:blocked:user:" + username))) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Akun sedang diblokir sementara karena terlalu banyak percobaan OTP.");
+//        }
+
+        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey("otp:cooldown:user:" + username))) {
+            long remaining = stringRedisTemplate.getExpire("otp:cooldown:user:" + username, TimeUnit.SECONDS);
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                    "Tunggu " + remaining + " detik sebelum mengirim OTP lagi.");
+        }
+
+        var resendKey = "otp:resend:user:" + username;
+        Long resendCount = stringRedisTemplate.opsForValue().increment(resendKey);
+        if (resendCount == 1) stringRedisTemplate.expire(resendKey, Duration.ofMinutes(10));
+
+        log.info("User {} melakukan resend OTP ke-{} dari 3", username, resendCount);
+
+        if (resendCount >= 3) {
+            stringRedisTemplate.opsForValue().set("otp:cooldown:user:" + username, "true", Duration.ofSeconds(120));
+            stringRedisTemplate.opsForValue().set("otp:blocked:user:" + username, "true", Duration.ofMinutes(10));
+
+            var finalOtp = String.format("%06d", new Random().nextInt(999999));
+            stringRedisTemplate.opsForHash().put(sessionKey, "otp", finalOtp);
+            stringRedisTemplate.expire(sessionKey, Duration.ofMinutes(3));
+            emailService.sendOtp(email, finalOtp);
+
+            log.warn("User {} sudah 3x resend OTP, diblokir sementara & cooldown aktif 120s", username);
+
+            return new ResendOtpResponse(
+                    true,
+                    "Kode OTP baru telah dikirim. Anda telah mencapai batas resend maksimal. Tunggu 2 menit sebelum mencoba lagi.",
+                    120
+            );
+        }
+
+            var newOtp = String.format("%06d", new Random().nextInt(999999));
+            stringRedisTemplate.opsForHash().put(sessionKey, "otp", newOtp);
+            stringRedisTemplate.expire(sessionKey, Duration.ofMinutes(3));
+
+            emailService.sendOtp(email, newOtp);
+
+            return new ResendOtpResponse(
+                    true,
+                    "Kode OTP baru telah dikirim ke email Anda. Resend ke-" + resendCount + " dari 3.",
+                    0
+            );
+    }
+
+    @Transactional
+    public LogoutResponse logout(String token, String userId) {
         var sessionKey = "session:" + userId;
         stringRedisTemplate.delete(sessionKey);
 
@@ -165,5 +269,8 @@ public class LoginOtpService{
 
         return new LogoutResponse(true, "logout berhasil");
     }
-
 }
+
+
+
+
