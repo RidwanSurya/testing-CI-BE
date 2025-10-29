@@ -31,6 +31,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.auth0:java-jwt:4.4.0")
 	implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("io.soabase.record-builder:record-builder-core:47")
@@ -51,6 +52,8 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
+    testImplementation("org.mockito:mockito-core:5.11.0")
+    testImplementation("org.assertj:assertj-core:3.26.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

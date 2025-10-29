@@ -13,13 +13,13 @@ import com.example.wandoor.service.AccountService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("api/account")
+@RequestMapping("api/v1")
 @RequiredArgsConstructor
 public class AccountController {
 
     private final AccountService accountService;
 
-    @PostMapping("/savings")
+    @PostMapping("/account")
     public ResponseEntity<AccountResponse> getAccountData(@RequestBody(required = false) AccountRequest request) {
         var response = accountService.dataAccount(request);
         return ResponseEntity.ok(response);

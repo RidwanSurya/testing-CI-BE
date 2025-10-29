@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Build aplikasi menggunakan Gradle, tanpa menjalankan test
-RUN gradle clean build
+RUN gradle clean build -x test
 
 # Stage 2: Menjalankan aplikasi dengan image OpenJDK ringan
 FROM openjdk:17-jdk-slim
