@@ -57,10 +57,10 @@ jobs:
           echo "SPRING_DATASOURCE_PASSWORD=password" >> $GITHUB_ENV
 
       # Build dengan Gradle (bisa tambahkan test jika ingin uji koneksi DB)
-      - name: Build with Gradle
+      - name: Build with Gradle 
         run: ./gradlew clean build -x test
 
-      #         # Build dan jalankan tes tertentu dengan Gradle
+      # Build dan jalankan tes tertentu dengan Gradle
       # - name: Build and run specific tests with Gradle
       #   run: ./gradlew clean test --tests "com.example.MathServiceTest.testTambah"  # Jalankan tes tertentu
 
@@ -84,20 +84,53 @@ jobs:
           push: true
           tags: jrtr1/wandoor-backend-app:backend-latest
 
-# # Deploy ke Minikube (contoh CD)
-#       - name: Deploy to Minikube
-#         run: |
-#           # Set up Minikube environment
-#           minikube start
-#           eval $(minikube docker-env)
+# DEPLOYMENT 
 
-#           # Deploy aplikasi Spring Boot ke Minikube
-#           kubectl apply -f deployment.yaml
-#           kubectl apply -f service.yaml
+      # Deploy Oracle DB
+      # - name: Deploy Oracle DB
+      #   run: |
+      #     kubectl apply -f oracle-db/oracle-pv.yaml
+      #     kubectl apply -f oracle-db/oracle-secret.yaml
+      #     kubectl apply -f oracle-db/oracle-deployment.yaml
 
-#           # Tunggu beberapa detik agar aplikasi dapat dijangkau
-#           echo "Waiting for Minikube to be ready..."
-#           sleep 30
+      # # Deploy Wandoor Backend
+      # - name: Deploy Wandoor Backend
+      #   run: |
+      #     kubectl apply -f wandoor-backend/backend-configmap.yaml
+      #     kubectl apply -f wandoor-backend/backend-deployment.yaml
 
-#           # Menampilkan IP dari Minikube untuk mengakses aplikasi
-#           minikube service spring-boot-app-service --url
+      # # Deploy Namespace
+      # - name: Deploy Namespace
+      #   run: |
+      #     kubectl apply -f namespace.yaml
+
+      # # Deploy Ingress
+      # - name: Deploy Ingress
+      #   run: |
+      #     kubectl apply -f ingress.yaml
+
+      # # Wait for Minikube to be ready (allow some time for pods and services to start)
+      # - name: Wait for Minikube to be ready
+      #   run: |
+      #     echo "Waiting for Minikube to be ready..."
+      #     sleep 30  # Waktu tunggu agar aplikasi siap dijangkau
+
+      # # Expose the service and get the URL
+      # - name: Get Minikube URL
+      #   run: |
+      #     minikube service frontend --url
+
+      #  # Deploy with Argo CD
+      # - name: Install Argo CD CLI
+      #   run: |
+      #     curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/v2.7.7/argocd-linux-amd64
+      #     chmod +x /usr/local/bin/argocd
+
+      # - name: Login to Argo CD
+      #   run: |
+      #     argocd login ${{ secrets.ARGOCD_SERVER }} --username ${{ secrets.ARGOCD_USERNAME }} --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
+
+      # - name: Trigger Argo CD Sync
+      #   run: |
+      #     argocd app sync wandoor-backend --timeout 600
+      #     argocd app wait wandoor-backend --timeout 600

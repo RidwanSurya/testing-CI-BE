@@ -7,6 +7,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,11 +19,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+@Log4j2
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     private final RequestContext requestContext;
+    private final StringRedisTemplate stringRedisTemplate;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest req,
@@ -53,7 +58,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         var token = header.substring(7);
         try {
+            var blacklistKey = "jwt_blacklist:" + token;
+            if (stringRedisTemplate.hasKey(blacklistKey)) {
+                unauthorized(response, "Unauthorized - Token sudah logout");
+                return;
+            }
+
             var jwt = jwtUtils.validateToken(token);
+//            log.info("✅ JWT valid untuk subject={}", jwt.getSubject());
             var userId = jwt.getSubject();
             var role = jwt.getClaim("role").asString();
 
@@ -66,15 +78,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ctx.setUserId(userIdHeader);
             ctx.setCif(cifHeader);
 
-
-            try{
                 filterChain.doFilter(req, response);
-            } finally {
-                RequestContext.clear();
-                SecurityContextHolder.clearContext();;
-            }
+
+//            try{
+//            } finally {
+//                RequestContext.clear();
+//                SecurityContextHolder.clearContext();
+//            }
 
         } catch (Exception e) {
+            log.error("❌ Error di JwtAuthenticationFilter: {}", e.getMessage(), e);
             SecurityContextHolder.clearContext();
             unauthorized(response, "Unauthorized - Token JWT tidak valid");
         }
