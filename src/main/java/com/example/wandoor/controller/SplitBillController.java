@@ -44,8 +44,9 @@ public class SplitBillController {
 
     @PostMapping("/add")
     public ResponseEntity<AddNewSplitBillResponse> createSplitBill(
-            @Valid @RequestBody AddNewSplitBillRequest request){
+            @RequestBody AddNewSplitBillRequest request){
 
+        System.out.println("Split Bill Controller");
         log.info("Receive create split bill request: {}", request.splitBillTitle());
         AddNewSplitBillResponse response = splitBillService.createSplitBill(request);
 
@@ -58,7 +59,7 @@ public class SplitBillController {
     public ResponseEntity<EditSplitBillResponse> editSplitBill(
             @Valid @RequestBody EditSplitBillRequest request){
 
-        log.info("Receive create split bill request: {}", request.splitBillTitle());
+//        log.info("Receive create split bill request: {}", request.splitBillTitle());
 
         EditSplitBillResponse response = splitBillService.editSplitBill(request);
         return ResponseEntity.ok(response);

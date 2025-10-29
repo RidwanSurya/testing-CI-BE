@@ -16,8 +16,9 @@ ALTER TABLE TRX_HISTORY ADD (
     party_detail        VARCHAR2(55) NOT NULL,
     payment_method      VARCHAR2(55),
     debit_credit        VARCHAR2(20) NOT NULL,
-    split_bill_id       VARCHAR2(21)
-)
+    split_bill_id       VARCHAR2(21),
+    ref_id              VARCHAR2(22) NOT NULL
+);
 
 ALTER TABLE TRX_HISTORY
 ADD CONSTRAINT FK_TRX_HISTORY_SPLIT_BILL

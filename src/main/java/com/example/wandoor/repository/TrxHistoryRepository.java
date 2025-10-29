@@ -41,5 +41,5 @@ public interface TrxHistoryRepository extends JpaRepository<TrxHistory, String> 
             @Param("year") int year
     );
 
-    Optional<TrxHistory> findByTrxId(String transactionId);
+    Optional<TrxHistory> findById(String transactionId);
 }

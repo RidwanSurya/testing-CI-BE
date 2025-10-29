@@ -11,12 +11,12 @@ import com.example.wandoor.model.response.SplitBillDetailResponse;
 import com.example.wandoor.model.request.AddNewSplitBillRequest;
 import com.example.wandoor.model.response.SplitBillsListResponse;
 import com.example.wandoor.repository.*;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -101,10 +101,14 @@ public class SplitBillService {
         var userId = RequestContext.get().getUserId();
         var cif = RequestContext.get().getCif();
 
-        var transaction = splitBillRepository.findByTransactionId(request.transactionId());
-        if (transaction.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
-        }
+        var splitBIllData = splitBillRepository.findByUserIdAndCifAndId(userId, cif, request.splitBillId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Split Bill Not Found"));
+//        if (splitBIllData.isEmpty()) {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found");
+//        }
+
+        var transactionData = trxHistoryRepository.findById(splitBIllData.getTransactionId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "No Transaction Related to Split BIll"));
 
         var members = splitBillMemberRepository.findAllBySplitBillId(request.splitBillId());
         if (members.isEmpty()) {
@@ -118,7 +122,7 @@ public class SplitBillService {
             BigDecimal amountShare = m.getAmountShare();
 
             // Jika hasPaid >= amountShare → Paid, else Unpaid
-            String status = (hasPaid.compareTo(amountShare) >= 0) ? "Paid" : "Unpaid";
+            //String status = (hasPaid.compareTo(amountShare) >= 0) ? "Paid" : "Unpaid";
 
             // Konversi tanggal ke String agar cocok dengan record
             String paymentDate = (m.getPaymentDate() != null)
@@ -129,36 +133,38 @@ public class SplitBillService {
                     m.getId(),
                     m.getMemberName(),
                     amountShare,
-                    status,
                     paymentDate,
                     hasPaid
             ));
         }
 
 
+
+
         // Ambil data utama dari transaksi split bill
-        var splitBill = transaction.get();
 
         SplitBillDetailResponse.Data data = new SplitBillDetailResponse.Data(
-                splitBill.getId(),
-                splitBill.getSplitBillTitle(),
-                splitBill.getCurrency(),
-                splitBill.getTotalAmount(),
-                splitBill.getCreatedTime().toString(),
-                splitBill.getTransactionId(),
+                splitBIllData.getId(),
+                splitBIllData.getSplitBillTitle(),
+                splitBIllData.getCurrency(),
+                transactionData.getRefId(),
+                splitBIllData.getCreatedTime().toString(),
+                splitBIllData.getTotalAmount(),
+                splitBIllData.getCreatedTime().toString(),
+                transactionData.getTransactionDate().toString(),
                 memberList
         );
 
         // Return response akhir
         return new SplitBillDetailResponse(
-                "success",
-                "Split Bill Detail Fetched Successfully",
                 data
         );
     }
 
-
+    @Transactional
     public AddNewSplitBillResponse createSplitBill(AddNewSplitBillRequest request) {
+//        System.out.println("Hai Aku dari Service");
+        log.info("Receive create split bill request dari service: {}", request.splitBillTitle());
         var userId = RequestContext.get().getUserId();
         var cif = RequestContext.get().getCif();
 
@@ -184,7 +190,6 @@ public class SplitBillService {
 
         //insert ke table split bill
         SplitBill splitBill = SplitBill.builder()
-                .id(UUID.randomUUID().toString())
                 .userId(userId)
                 .cif(cif)
                 .accountNumber(account.getAccountNumber())
@@ -194,13 +199,16 @@ public class SplitBillService {
                 .totalAmount(trx.getTransactionAmount())
                 .isDeleted(0)
                 .createdBy("SYSTEM")
+                .createdTime(LocalDateTime.now())
                 .updatedBy("SYSTEM")
                 .updatedTime(LocalDateTime.now())
                 .build();
 
+        var savedSplitBill = splitBillRepository.save(splitBill);
+
         List<SplitBillMember> members = request.billMembers().stream()
                 .map(m -> SplitBillMember.builder()
-                        .splitBill(SplitBill.builder().id(splitBill.getId()).build())
+                        .splitBill(savedSplitBill)
                         .userId(userData.getId())
                         .memberName(m.memberName())
                         .amountShare(m.amountShare())
@@ -223,7 +231,7 @@ public class SplitBillService {
         );
     }
 
-    @Transactional
+   @Transactional
     public EditSplitBillResponse editSplitBill(EditSplitBillRequest request) {
         // validate user data
         var cif = RequestContext.get().getCif();
@@ -232,10 +240,10 @@ public class SplitBillService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User Not Found"));
 
         // validate Split Bill Data
-        var trxHistoryData = trxHistoryRepository.findByTrxId(request.transactionId())
+        var trxHistoryData = trxHistoryRepository.findById(request.transactionId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Invalid Transaction Id"));
 
-        var splitBillData = splitBillRepository.findBySplitBillIdAndUserIdAndCifAndTransactionId(request.splitBillId(), userData.getId(), userData.getCif(), trxHistoryData.getId())
+        var splitBillData = splitBillRepository.findByIdAndUserIdAndCifAndTransactionId(request.splitBillId(), userData.getId(), userData.getCif(), trxHistoryData.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Split Bill Data Not Found"));
 
 
