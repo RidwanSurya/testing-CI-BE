@@ -10,6 +10,7 @@ public record VerifyOtpResponse(
 
     public record User (
             String userId,
+            String cif,
             String username,
             String role
     ) {}

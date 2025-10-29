@@ -182,6 +182,8 @@ public class LoginOtpService {
                 .orElse("Nasabah");
         var userData = userAuthRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found"));
+        var profile = profileRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "profile not found"));
 
         var token = jwtUtils.generateToken(userId, role);
 
@@ -191,6 +193,7 @@ public class LoginOtpService {
 
         var dataUser = new VerifyOtpResponse.User(
                 userData.getUserId(),
+                profile.getCif(),
                 userData.getUsername(),
                 role
         );
