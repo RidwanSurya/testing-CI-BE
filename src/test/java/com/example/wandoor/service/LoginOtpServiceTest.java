@@ -12,6 +12,7 @@ import com.example.wandoor.util.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,6 +39,8 @@ class LoginOtpServiceTest {
     private EmailService emailService;
     @Mock
     private JwtUtils jwtUtils;
+    @Mock
+    private StringRedisTemplate stringRedisTemplate;
 
     @InjectMocks
     private LoginOtpService loginOtpService;
@@ -78,7 +81,7 @@ class LoginOtpServiceTest {
 
         assertThat(response.status()).isTrue();
         assertThat(response.message()).contains("Kode OTP");
-        assertThat(response.otpRef()).isNotNull();
+        assertThat(response.sessionId()).isNotNull();
 
         verify(emailService, times(1)).sendOtp(eq("oktaviaqa@example.com"), anyString());
     }
