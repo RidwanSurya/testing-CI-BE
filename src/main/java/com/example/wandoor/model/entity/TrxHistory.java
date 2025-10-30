@@ -1,9 +1,7 @@
 package com.example.wandoor.model.entity;
 
 import com.example.wandoor.model.enums.DebitCredit;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -49,15 +47,15 @@ public class TrxHistory {
 
     private String paymentMethod;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "debit_credit",nullable = false)
     private DebitCredit debitCredit;
 
     @Column(nullable = false)
     private String splitBillId;
 
-    @Builder.Default
     @Column(nullable = false)
-    private Integer hasSplitted = 0;
+    private String refId;
 
     @Column(nullable = false)
     private String createdBy;

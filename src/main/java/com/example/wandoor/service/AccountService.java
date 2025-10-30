@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.example.wandoor.model.enums.ProductType;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -68,7 +69,7 @@ public class AccountService {
         TargetAccountDetail targetAccountDetail = new TargetAccountDetail(
                 selectedAccount.getAccountNumber(),
                 selectedAccount.getAccountHolderName(),
-                selectedAccount.getAccountType().name(),
+                selectedAccount.getProductName(),
                 selectedAccount.getEffectiveBalance(),
                 selectedAccount.getIsMainAccount() == 1,
                 selectedAccount.getAccountStatus().toString()
