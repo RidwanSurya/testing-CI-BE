@@ -65,8 +65,8 @@ public class DashboardService {
         var remainingBillAmount = nvl(splitBillMemberRepository.sumRemainingForCreator(userId, cif));
 
         // CASH FLOW OVERVIEW
-        var totalIncome = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndCifAndDebitCredit(userId, DebitCredit.D));
-        var totalExpenses = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndCifAndDebitCredit(userId, DebitCredit.C));
+        var totalIncome = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndDebitCredit(userId, cif, DebitCredit.D));
+        var totalExpenses = nvl(trxHistoryRepository.sumTransactionAmountByUserIdAndDebitCredit(userId, cif, DebitCredit.C));
 
         // Portfolio Overview
         var portfolioOverview = List.of(
