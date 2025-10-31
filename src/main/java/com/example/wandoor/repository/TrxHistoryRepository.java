@@ -17,9 +17,9 @@ public interface TrxHistoryRepository extends JpaRepository<TrxHistory, String> 
         WHERE t.userId = :userId
           AND t.debitCredit = :debitCredit
     """)
-    BigDecimal sumTransactionAmountByUserIdAndCifAndDebitCredit(
+    BigDecimal sumTransactionAmountByUserIdAndDebitCredit(
             @Param("userId") String userId,
-//            @Param("cif") String cif,
+            @Param("cif") String cif,
             @Param("debitCredit") DebitCredit debitCredit
     );
 

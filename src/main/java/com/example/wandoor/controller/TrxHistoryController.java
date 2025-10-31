@@ -16,7 +16,7 @@ public class TrxHistoryController {
 
     private final TransactionHistoryService service;
 
-    @PostMapping("trx-history")
+    @PostMapping("/trx-history")
     ResponseEntity<TransactionHistoryResponse> fetchTransactionHistory(TransactionHistoryRequest request){
         var response = service.fetchTransactionHistory(request);
         return ResponseEntity.ok(response);
