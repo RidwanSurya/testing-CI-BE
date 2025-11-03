@@ -19,6 +19,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -72,6 +77,8 @@ public class TrxHistory {
     //@Column(nullable = false)
     //private Integer hasSplitted = 0;
 
+    @Column(nullable = false)
+    private String refId;
 
     @Column(nullable = false)
     private String createdBy;

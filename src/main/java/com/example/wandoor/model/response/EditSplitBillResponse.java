@@ -1,6 +1,6 @@
 package com.example.wandoor.model.response;
 
-public record AddNewSplitBillResponse(
+public record EditSplitBillResponse (
         String message,
         String splitBillId
 ) {}

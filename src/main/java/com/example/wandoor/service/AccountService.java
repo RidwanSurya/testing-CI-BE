@@ -69,7 +69,7 @@ public class AccountService {
 
                 selectedAccount.getAccountNumber(),
                 selectedAccount.getAccountHolderName(),
-                selectedAccount.getAccountType().toString(),
+                selectedAccount.getProductName(),
                 selectedAccount.getEffectiveBalance(),
                 selectedAccount.getIsMainAccount() == 1,
                 selectedAccount.getAccountStatus().toString()
