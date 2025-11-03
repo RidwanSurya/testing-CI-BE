@@ -1,10 +1,14 @@
 package com.example.wandoor.service;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.example.wandoor.config.RequestContext;
 import com.example.wandoor.model.entity.TrxHistory;
 import com.example.wandoor.model.enums.AccountStatus;
-import com.example.wandoor.model.enums.DebitCredit;
-import com.example.wandoor.model.enums.ProductType;
 import com.example.wandoor.model.request.TransactionHistoryRequest;
 import com.example.wandoor.model.response.TransactionHistoryResponse;
 import com.example.wandoor.model.response.TransactionHistoryResponseBuilder;
@@ -13,16 +17,9 @@ import com.example.wandoor.model.response.TrxResponseBuilder;
 import com.example.wandoor.repository.AccountRepository;
 import com.example.wandoor.repository.ProfileRepository;
 import com.example.wandoor.repository.TrxHistoryRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-//import com.example.wandoor.model.response.TrxBuilder;
-
-import java.math.BigDecimal;
-import java.time.Month;
-import java.util.List;
 
 
 @Service
