@@ -40,8 +40,7 @@ public class LoginOtpService {
     private final ProfileRepository profileRepository;
     private final RoleManagementRepository roleManagementRepository;
     private final JwtUtils jwtUtils;
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final RedisTemplate<String, String> stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final BlockUserNow blockUserNow;
 
     private static final Duration OTP_TTL = Duration.ofMinutes(3);
