@@ -25,7 +25,7 @@ CREATE INDEX IDX_PROFILE_USERNAME ON PROFILE(username);
 CREATE TABLE role_management (
   id            VARCHAR2(36)   NOT NULL,
   user_id       VARCHAR2(36)   NOT NULL, -- FK ke PROFILE.id
-  role_name     VARCHAR2(21)   NOT NULL, -- 'ADMIN' atau 'NASABAH'
+  role_name     VARCHAR2(21)   NOT NULL,
   created_by    VARCHAR2(50)   NOT NULL,
   created_time  TIMESTAMP      NOT NULL,
   updated_by    VARCHAR2(50)   NOT NULL,

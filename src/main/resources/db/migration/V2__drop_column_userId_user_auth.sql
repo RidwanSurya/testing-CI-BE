@@ -1,25 +1,18 @@
-DECLARE
-    v_constraint_name VARCHAR2(100);
 BEGIN
-    -- Cek apakah constraint dengan nama ini ada di user_constraints
-    SELECT constraint_name INTO v_constraint_name
-    FROM user_constraints
-    WHERE table_name = 'USER_AUTH'
-      AND constraint_name = 'FK_USER_AUTH_USER_ID'
-      AND constraint_type = 'R';
-
-    -- Jika ketemu, drop constraint-nya
-    EXECUTE IMMEDIATE 'ALTER TABLE user_auth DROP CONSTRAINT FK_USER_AUTH_USER_ID';
-
+    EXECUTE IMMEDIATE 'ALTER TABLE ROLE_MANAGEMENT DROP CONSTRAINT FK_ROLE_MGMT_PROFILE';
 EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        DBMS_OUTPUT.PUT_LINE('Constraint FK_USER_AUTH_USER_ID not found, skipping.');
     WHEN OTHERS THEN
-        -- Hanya abaikan error ORA-02443 (constraint tidak ada)
-        IF SQLCODE != -2443 THEN
+        IF SQLCODE != -2443 THEN -- ORA-02443: constraint not found
             RAISE;
         END IF;
 END;
 /
-
-ALTER TABLE USER_AUTH DROP COLUMN USER_ID;
+BEGIN
+    EXECUTE IMMEDIATE 'ALTER TABLE ROLE_MANAGEMENT DROP COLUMN USER_ID';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -904 THEN -- ORA-00904: column not found
+            RAISE;
+        END IF;
+END;
+/
