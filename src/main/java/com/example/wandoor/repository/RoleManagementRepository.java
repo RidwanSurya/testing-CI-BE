@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface RoleManagementRepository extends JpaRepository <RoleManagement, String>{
-    Optional<RoleManagement> findFirstByUserId(String userid);
+    Optional<RoleManagement> findFirstById(String id);
 }

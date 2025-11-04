@@ -167,7 +167,7 @@ class LoginOtpServiceTest {
         lenient().when(userOtpVerificationRepository.consumeIfValid(anyString(), anyString(), any())).thenReturn(1);
         lenient().when(userAuthRepository.findById("U001"))
                 .thenReturn(Optional.of(new UserAuth("U001", "oktaviaqa", null, null, null, 0)));
-        when(roleManagementRepository.findFirstByUserId("U001"))
+        when(roleManagementRepository.findFirstById("U001"))
                 .thenReturn(Optional.of(new RoleManagement()));
 
         lenient().when(profileRepository.findById("U001")).thenReturn(Optional.of(profile));

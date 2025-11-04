@@ -150,11 +150,11 @@ public class LoginOtpService {
         stringRedisTemplate.delete(otpSessionKey);
         stringRedisTemplate.delete("otp:verify_attempt:" + req.sessionId());
 
-        var role = roleManagementRepository.findFirstByUserId(userId)
-                .map(RoleManagement::getRoleName)
-                .orElse("NASABAH");
         var userData = userAuthRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found"));
+        var role = roleManagementRepository.findFirstById(userData.getRoleId())
+                .map(RoleManagement::getRoleName)
+                .orElse("NASABAH");
         var profile = profileRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "profile not found"));
 

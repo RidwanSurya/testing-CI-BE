@@ -45,9 +45,9 @@ logging:
   level:
     root: INFO
     com.wandoor: INFO
-    org.springframework.security: DEBUG
-    org.springframework.data.redis.core.RedisTemplate: DEBUG
-    io.lettuce.core.protocol: DEBUG
+    org.springframework.security: INFO
+    org.springframework.data.redis.core.RedisTemplate: INFO
+    io.lettuce.core.protocol: INFO
 
 # secret & expiry JWT
 app:
