@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
+import org.slf4j.MDC;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,6 +57,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             unauthorized(response, "Unauthorized - Missing userId or cif header");
             return;
         }
+
+        MDC.put("userId", userIdHeader);
+        MDC.put("cif", cifHeader);
 
         var token = header.substring(7);
         try {
