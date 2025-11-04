@@ -11,7 +11,7 @@ COPY . .
 RUN gradle clean build
 
 # Stage 2: Menjalankan aplikasi dengan image OpenJDK ringan
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 
 # Set working directory
 WORKDIR /app
