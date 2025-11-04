@@ -1,16 +1,13 @@
 package com.example.wandoor.service;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import com.example.wandoor.model.request.*;
 import com.example.wandoor.model.response.*;
-import org.springframework.data.redis.core.RedisTemplate;
+import com.example.wandoor.util.OtpGuards;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -44,11 +41,8 @@ public class LoginOtpService {
     private final BlockUserNow blockUserNow;
 
     private static final Duration OTP_TTL = Duration.ofMinutes(3);
-    private static final Duration COOLDOWN_TTL = Duration.ofSeconds(120);
     private static final Duration BLOCK_TTL = Duration.ofMinutes(10);
     private static final Duration LOGIN_FAIL_TTL = Duration.ofHours(1);
-    private static final Duration ISSUE_WINDOW = Duration.ofMinutes(10);
-    private static final int ISSUE_LIMIT = 3;
     private static final Duration TOKEN_TTL = Duration.ofHours(2);
     private static final Duration VERIFY_TTL = Duration.ofMinutes(10);
 
@@ -84,7 +78,7 @@ public class LoginOtpService {
         stringRedisTemplate.delete("otp:login_failed:" + req.username());
 
         var sessionId = UUID.randomUUID().toString();
-        var otp = String.format("%06d", new Random().nextInt(999999));
+        var otp = OtpGuards.generateNumericOtp();
 
         var otpSessionKey = "otp:session:" + sessionId;
         Map<String, String> otpData = Map.of(
@@ -210,7 +204,7 @@ public class LoginOtpService {
             stringRedisTemplate.opsForValue().set("otp:cooldown:user:" + username, "true", Duration.ofSeconds(120));
             stringRedisTemplate.opsForValue().set("otp:blocked:user:" + username, "true", Duration.ofMinutes(10));
 
-            var finalOtp = String.format("%06d", new Random().nextInt(999999));
+            var finalOtp = OtpGuards.generateNumericOtp();
             stringRedisTemplate.opsForHash().put(sessionKey, "otp", finalOtp);
             stringRedisTemplate.expire(sessionKey, Duration.ofMinutes(3));
             emailService.sendOtp(email, finalOtp);
@@ -224,7 +218,7 @@ public class LoginOtpService {
             );
         }
 
-            var newOtp = String.format("%06d", new Random().nextInt(999999));
+            var newOtp = OtpGuards.generateNumericOtp();
             stringRedisTemplate.opsForHash().put(sessionKey, "otp", newOtp);
             stringRedisTemplate.expire(sessionKey, Duration.ofMinutes(3));
 
@@ -261,7 +255,7 @@ public class LoginOtpService {
         }
 
         var sessionId = UUID.randomUUID().toString();
-        var otp = String.format("%06d", new Random().nextInt(999999));
+        var otp = OtpGuards.generateNumericOtp();
 
         var keyForgotOtp = "otp:forgot:" + sessionId;
         stringRedisTemplate.opsForHash().putAll(keyForgotOtp, Map.of(
