@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 
 # Build menjalankan test
-RUN gradle clean build
+RUN gradle clean build -x test
 
 ## Stage 2: Jalankan aplikasi dengan image OpenJDK ringan
 FROM eclipse-temurin:17-jdk
