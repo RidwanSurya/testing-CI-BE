@@ -65,6 +65,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: false
+          load: true
           tags: jrtr1/wandoor-backend-app:temp-scan
 
       # Verifikasi image sudah ada
