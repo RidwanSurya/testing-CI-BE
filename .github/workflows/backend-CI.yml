@@ -68,14 +68,14 @@ jobs:
           tags: jrtr1/wandoor-backend-app:temp-scan
 
       # === TRIVY SCAN ===
-      # - name: Run Trivy vulnerability scanner
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     image-ref: "jrtr1/wandoor-backend-app:temp-scan"
-      #     format: "table"
-      #     exit-code: "0"
-      #     vuln-type: "os,library"
-      #     severity: "CRITICAL,HIGH"
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "jrtr1/wandoor-backend-app:temp-scan"
+          format: "table"
+          exit-code: "0"
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
 
       # Login ke DockerHub
       - name: Log in to DockerHub
