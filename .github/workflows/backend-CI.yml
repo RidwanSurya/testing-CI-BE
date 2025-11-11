@@ -73,6 +73,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+              # === TRIVY SCAN ===
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "jrtr1/wandoor-backend-app:temp-scan"
+          format: "table"
+          exit-code: "0"
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
+
       # Build dan Push image ke Docker Hub
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
