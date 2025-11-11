@@ -70,9 +70,7 @@ jobs:
 
       # Verifikasi image sudah ada
       - name: Verify Docker image exists
-        run: docker images | grep wandoor-backend-app
-
-      # === TRIVY SCAN (BEST PRACTICE) ===
+        run: docker images | grep jrtr1/wandoor-backend-app
       
       # 1. Scan Docker image (PRIORITAS UTAMA)
       - name: Run Trivy vulnerability scanner
